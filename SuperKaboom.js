@@ -13,26 +13,10 @@ kaboom();
     ]);
  }
 
- function instantiatePlayer(){
-  add([
-    z(5),
-    sprite("player"),
-    pos(100, 200),
-    health(8),
-    move(0, 0 ),
-    // Plain strings are tags, a quicker way to let us define behaviors for a group
-    "player",
-    "friendly",
-    // Components are just plain objects, you can pass an object literal as a component.
-    {
-        dead: false,
-        
-    },
-  ]);
- }
+ 
 
 
- document.body.style.overflow = 'hidden';
+document.body.style.overflow = 'hidden';
 
 loadSprite("grass", "assets/Grass.png");
 
@@ -40,21 +24,53 @@ loadSprite("obunga", "assets/OIP.png");
 
 loadSprite("player", "assets/Ball.png");
 
+
 let player;
 
-onKeyDown("w", ()=> {
-  player.move(0, 1);
- }
-);
 
 scene("game", ()=>{
-   loadBackground("grass"),
+
+
+
+
+loadBackground("grass"),
 add([
     sprite("obunga")
     ])
-player = instantiatePlayer();
+
+
+player =  add([
+  z(5),
+  sprite("player"),
+  pos(100, 200),
+  health(8),
+  // Plain strings are tags, a quicker way to let us define behaviors for a group
+  "player",
+  "friendly",
+  // Components are just plain objects, you can pass an object literal as a component.
+  {
+      dead: false,
+      speed: 1000
+  }
+])
+
 });
 
+onKeyDown("d", ()=> {
+  player.move(player.speed, 0);
+});
+
+onKeyDown("a", ()=> {
+  player.move(-player.speed, 0);
+});
+
+onKeyDown("w", ()=> {
+  player.move(0, -player.speed);
+});
+
+onKeyDown("s", ()=> {
+  player.move(0, player.speed);
+});
 
 
 go("game");
