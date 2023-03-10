@@ -1,5 +1,11 @@
 import kaboom from "https://unpkg.com/kaboom/dist/kaboom.mjs";
     
+
+
+
+kaboom();
+
+
  function loadBackground(backgroundName){
     add([
         sprite(backgroundName),
@@ -12,23 +18,19 @@ import kaboom from "https://unpkg.com/kaboom/dist/kaboom.mjs";
     z(5),
     sprite("player"),
     pos(100, 200),
-    area(),
-    body(),
     health(8),
-    doubleJump(),
-    move(),
+    move(0, 0 ),
     // Plain strings are tags, a quicker way to let us define behaviors for a group
     "player",
     "friendly",
     // Components are just plain objects, you can pass an object literal as a component.
     {
-        dir: LEFT,
         dead: false,
-        speed: 240,
+        
     },
   ]);
  }
- kaboom();
+
 
  document.body.style.overflow = 'hidden';
 
@@ -38,7 +40,12 @@ loadSprite("obunga", "assets/OIP.png");
 
 loadSprite("player", "assets/Ball.png");
 
-let player = null;
+let player;
+
+onKeyDown("w", ()=> {
+  player.move(0, 1);
+ }
+);
 
 scene("game", ()=>{
    loadBackground("grass"),
@@ -49,8 +56,7 @@ player = instantiatePlayer();
 });
 
 
+
 go("game");
 
-onKeyDown("w", ()=> {
-  player.move(0, 100)
-})
+
