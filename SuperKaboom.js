@@ -33,26 +33,26 @@ scene("game", ()=>{
 
 
 
-loadBackground("grass"),
-add([
-    sprite("obunga")
+  loadBackground("grass"),
+  add([
+      sprite("obunga")
     ])
 
-
-player =  add([
-  z(5),
-  sprite("player"),
-  pos(100, 200),
-  health(8),
-  // Plain strings are tags, a quicker way to let us define behaviors for a group
-  "player",
-  "friendly",
-  // Components are just plain objects, you can pass an object literal as a component.
-  {
-      dead: false,
-      speed: 1000
-  }
-])
+  
+  player =  add([
+    z(5),
+    sprite("player"),
+    pos(100, 200),
+    health(8),
+    // Plain strings are tags, a quicker way to let us define behaviors for a group
+    "player",
+    "friendly",
+   // Components are just plain objects, you can pass an object literal as a component.
+    {
+       dead: false,
+        speed: 1000
+   }
+  ])
 
 });
 
