@@ -59,6 +59,7 @@ const player =  add([
 
 
 scene("game", ()=>{
+
   loadBackground("grass"),
   add([
       sprite("obunga")
