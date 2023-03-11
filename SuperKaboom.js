@@ -72,14 +72,17 @@ scene("game", ()=>{
 
 onKeyDown("d", ()=> {
   player.move(player.speed, 0);
+  player.flipX = false
 });
 
 onKeyDown("a", ()=> {
   player.move(-player.speed, 0);
+  player.flipX = true
 });
 
 onKeyDown("w", ()=> {
   player.move(0, -player.speed);
+ 
 });
 
 onKeyDown("s", ()=> {
