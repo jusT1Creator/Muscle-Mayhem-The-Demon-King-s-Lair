@@ -65,14 +65,22 @@ const player =  add([
 ])
 
 player.play("idle");
+const obunga = add([
+  sprite("obunga"),
+  pos(0, -275),
+  {
+    speed: 20
+  }
+])
 
 scene("game", ()=>{
 
   loadBackground("grass"),
-  add([
-      sprite("obunga")
-    ])
+  add(obunga),
   add(player)
+  onUpdate( () =>{
+    obunga.move(0, 5)
+  })
 });
 
 
