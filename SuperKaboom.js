@@ -24,24 +24,33 @@ loadSprite("obunga", "assets/OIP.png");
 
 loadSprite("player", "assets/Ball.png");
 
-loadSprite("Bruce_Wang", "assets/Bruce_wang_idle.png",{
+loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
-  sliceY:1,
+  sliceY:3,
   anims:{
     idle:{
       from: 0,
       to: 3,
       loop : true,
+      speed: 2,
     },
+    run:{
+      from: 4, 
+      to: 11,
+      loop: true,
+      speed: 15,
+    }
   },
 
 });
 
+
+
+
 const player =  add([
   z(5),
   sprite("Bruce_Wang", {
-    animSpeed: 0.2,
-    frame: 1,
+    frame: 0,
   }),
   pos(100, 200),
   health(8),
@@ -51,12 +60,11 @@ const player =  add([
  // Components are just plain objects, you can pass an object literal as a component.
   {
      dead: false,
-      speed: 500
+      speed: 700
  }
 ])
 
-
-
+player.play("idle");
 
 scene("game", ()=>{
 
@@ -73,11 +81,19 @@ scene("game", ()=>{
 onKeyDown("d", ()=> {
   player.move(player.speed, 0);
   player.flipX = false
+  if(player.curAnim() != "run")
+  {
+    player.play("run");
+  }
 });
 
 onKeyDown("a", ()=> {
   player.move(-player.speed, 0);
   player.flipX = true
+  if(player.curAnim() != "run")
+  {
+    player.play("run");
+  }
 });
 
 onKeyDown("w", ()=> {
@@ -89,9 +105,21 @@ onKeyDown("s", ()=> {
   player.move(0, player.speed);
 });
 
-if(player != null){
-  player.play("idle");
-}
+onKeyRelease("a", ()=>{
+  player.play("idle")
+})
+
+onKeyRelease("d", ()=>{
+  player.play("idle")
+})
+
+onKeyRelease("w", ()=>{
+  player.play("idle")
+})
+
+onKeyRelease("s", ()=>{
+  player.play("idle")
+})
 
 go("game");
 
