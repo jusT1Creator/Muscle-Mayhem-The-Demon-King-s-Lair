@@ -118,7 +118,7 @@ onKeyDown("w", ()=> {
 onKeyDown("s", ()=> {
   player.move(0, player.speed);
   
-  if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward")
+  if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward") // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
   {
     player.play("runForward");
   }
