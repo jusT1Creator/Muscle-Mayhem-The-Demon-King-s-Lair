@@ -26,7 +26,7 @@ loadSprite("player", "assets/Ball.png");
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
-  sliceY:3,
+  sliceY:4,
   anims:{
     idle:{
       from: 0,
@@ -34,11 +34,17 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       loop : true,
       speed: 2,
     },
-    run:{
+    runHorizontal:{
       from: 4, 
       to: 11,
       loop: true,
       speed: 15,
+    },
+    runForward:{
+      from: 12,
+      to: 15,
+      loop: true,
+      speed: 10,
     }
   },
 
@@ -89,28 +95,33 @@ scene("game", ()=>{
 onKeyDown("d", ()=> {
   player.move(player.speed, 0);
   player.flipX = false
-  if(player.curAnim() != "run")
+  if(player.curAnim() != "runHorizontal")
   {
-    player.play("run");
+    player.play("runHorizontal");
   }
 });
 
 onKeyDown("a", ()=> {
   player.move(-player.speed, 0);
   player.flipX = true
-  if(player.curAnim() != "run")
+  if(player.curAnim() != "runHorizontal")
   {
-    player.play("run");
+    player.play("runHorizontal");
   }
 });
 
 onKeyDown("w", ()=> {
   player.move(0, -player.speed);
- 
+  
 });
 
 onKeyDown("s", ()=> {
   player.move(0, player.speed);
+  
+  if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward")
+  {
+    player.play("runForward");
+  }
 });
 
 onKeyRelease("a", ()=>{
