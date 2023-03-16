@@ -24,6 +24,8 @@ loadSprite("obunga", "assets/OIP.png");
 
 loadSprite("player", "assets/Ball.png");
 
+loadSound("music", "assets/Bruce wang.m4a")
+
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
   sliceY:4,
@@ -51,7 +53,10 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
 });
 
 
-
+const music = play("music", {
+  volume: 0.5,
+  loop: true,
+});
 
 const player =  add([
   z(5),
@@ -87,6 +92,10 @@ scene("game", ()=>{
   onUpdate( () =>{
     obunga.move(0, 5)
   })
+
+  
+  
+  
 });
 
 
@@ -144,3 +153,10 @@ go("game");
 
 
 
+onKeyPress("space", () => {  // <-------- !!!!!!!! Pause or unpause the music !!!!!!!!
+  if (music.paused) {
+    music.play()
+  } else {
+    music.paused = true
+  }
+});
