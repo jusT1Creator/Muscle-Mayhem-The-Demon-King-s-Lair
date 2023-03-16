@@ -93,10 +93,10 @@ const obunga = add([
 
 scene("game", ()=>{
 
-  loadBackground("grass", -1000, -1000),
-  loadBackground("grass", -8765, -1000),
-  loadBackground("grass", -1000, -5310),
-  loadBackground("grass", -8765, -5310),
+  loadBackground("grass", 0, 0),
+  loadBackground("grass", -7765, 0),
+  loadBackground("grass", 0, -4310),
+  loadBackground("grass", -7765, -4310),
   add(obunga),
   add(player)
   onUpdate( () =>{
