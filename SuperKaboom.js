@@ -97,14 +97,11 @@ scene("game", ()=>{
   add(player)
   onUpdate( () =>{
     obunga.move(0, 5)
-  })
-
-  
-  
+  }) 
   
 });
 
-music.play();
+
 
 
 onKeyDown("d", ()=> {
@@ -169,3 +166,8 @@ onKeyPress("space", () => {  // <-------- !!!!!!!! Pause or unpause the music !!
     music.paused = true
   }
 });
+
+player.onUpdate(() => {
+	// Set the viewport center to player.pos
+	camPos(player.worldPos())
+})
