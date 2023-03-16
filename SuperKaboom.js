@@ -6,10 +6,11 @@ import kaboom from "https://unpkg.com/kaboom/dist/kaboom.mjs";
 kaboom();
 
 
- function loadBackground(backgroundName){
+ function loadBackground(backgroundName, posX, posY){
     add([
         sprite(backgroundName),
-        scale(width()/220, height()/220)
+        scale(width()/450, height()/450),
+        pos(posX, posY)
     ]);
  }
 
@@ -18,7 +19,7 @@ kaboom();
 
 document.body.style.overflow = 'hidden';
 
-loadSprite("grass", "assets/Grass.png");
+loadSprite("grass", "assets/Grass_Background.png");
 
 loadSprite("obunga", "assets/OIP.png");
 
@@ -92,7 +93,10 @@ const obunga = add([
 
 scene("game", ()=>{
 
-  loadBackground("grass"),
+  loadBackground("grass", -1000, -1000),
+  loadBackground("grass", -8765, -1000),
+  loadBackground("grass", -1000, -5310),
+  loadBackground("grass", -8765, -5310),
   add(obunga),
   add(player)
   onUpdate( () =>{
