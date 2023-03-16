@@ -28,7 +28,7 @@ loadSound("music", "assets/Bruce wang.m4a")
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
-  sliceY:4,
+  sliceY:5,
   anims:{
     idle:{
       from: 0,
@@ -46,7 +46,13 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       from: 12,
       to: 15,
       loop: true,
-      speed: 10,
+      speed: 8,
+    },
+    runBackward:{
+      from: 16,
+      to: 19,
+      loop: true,
+      speed: 8,
     }
   },
 
@@ -98,7 +104,7 @@ scene("game", ()=>{
   
 });
 
-
+music.play();
 
 
 onKeyDown("d", ()=> {
@@ -121,7 +127,10 @@ onKeyDown("a", ()=> {
 
 onKeyDown("w", ()=> {
   player.move(0, -player.speed);
-  
+  if(player.curAnim() != "runHorizontal" && player.curAnim() != "runBackward") // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
+  {
+    player.play("runBackward");
+  }
 });
 
 onKeyDown("s", ()=> {
