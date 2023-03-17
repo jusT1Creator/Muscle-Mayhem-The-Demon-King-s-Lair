@@ -1,10 +1,10 @@
 
 import k from "./kabam.js"
 import { Test } from "./test.js";
-import { Game } from "./Game.js";
+import { Start } from "./Start.js";
  
-scene("game", Game);
+scene("start", Start);
 
-go("game")
+go("start")
 
 

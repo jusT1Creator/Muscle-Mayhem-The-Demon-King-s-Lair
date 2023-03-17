@@ -74,6 +74,7 @@ const player =  add([
   }),
   pos(100, 200),
   health(8),
+  area(),
   // Plain strings are tags, a quicker way to let us define behaviors for a group
   "player",
   "friendly",
@@ -178,4 +179,8 @@ onKeyDown("d", ()=> {
   
   onMouseDown("left", ()=>{
     player.play("punch");
+  })
+
+  player.onClick(() => {
+    debug.log("uhcuwhiwfwin")
   })
