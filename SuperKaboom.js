@@ -41,7 +41,7 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       from: 4, 
       to: 11,
       loop: true,
-      speed: 15,
+      speed: 16,
     },
     runForward:{
       from: 12,
@@ -99,9 +99,7 @@ scene("game", ()=>{
   loadBackground("grass", -7765, -4310),
   add(obunga),
   add(player)
-  onUpdate( () =>{
-    obunga.move(0, 5)
-  }) 
+ 
   
 });
 
@@ -175,3 +173,7 @@ player.onUpdate(() => {
 	// Set the viewport center to player.pos
 	camPos(player.worldPos())
 })
+
+obunga.onUpdate( () =>{
+  obunga.move(0, 5)
+}) 
