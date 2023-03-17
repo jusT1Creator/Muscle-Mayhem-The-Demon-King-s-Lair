@@ -27,9 +27,11 @@ loadSprite("player", "assets/Ball.png");
 
 loadSound("music", "assets/Bruce wang.m4a")
 
+loadSound("overtaken", "assets/Overtaken.m4a")
+
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
-  sliceY:5,
+  sliceY:6,
   anims:{
     idle:{
       from: 0,
@@ -54,13 +56,19 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       to: 19,
       loop: true,
       speed: 8,
+    },
+    punch:{
+      from: 20,
+      to: 23,
+      loop: false,
+      speed: 18,
     }
   },
 
 });
 
 
-const music = play("music", {
+const music = play("overtaken", {
   volume: 0.5,
   loop: true,
 });
@@ -177,3 +185,7 @@ player.onUpdate(() => {
 obunga.onUpdate( () =>{
   obunga.move(0, 5)
 }) 
+
+onMouseDown("left", ()=>{
+  player.play("punch");
+})
