@@ -1,5 +1,14 @@
 import k from "./kabam.js"
 
+
+let attackFieldPositionsX = [120, -50, 40];
+let attackFieldPositionsY = [-100, 100, 0];
+let attackFieldConditionX = attackFieldPositionsX[0];
+let attackFieldConditionY = attackFieldPositionsY[2];
+
+
+
+
 function loadBackground(backgroundName, posX, posY){
     add([
         sprite(backgroundName),
@@ -22,6 +31,8 @@ loadSprite("player", "assets/Ball.png");
 loadSound("music", "assets/Bruce wang.m4a")
 
 loadSound("overtaken", "assets/Overtaken.m4a")
+
+loadSprite("attackField", "assets/Player_Attack_Field.png")
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
@@ -73,9 +84,12 @@ const player =  add([
   sprite("Bruce_Wang", {
     frame: 0,
   }),
-  pos(100, 200),
+  pos(),
   health(8),
-  area(),
+  area({ 
+    scale: vec2(0.5, 1),
+    offset: vec2(80, 0)
+  }),
   // Plain strings are tags, a quicker way to let us define behaviors for a group
   "player",
   "friendly",
@@ -84,6 +98,12 @@ const player =  add([
      dead: false,
       speed: 700
  }
+])
+
+const playerAttackField = add([
+  pos(),
+  area({scale: vec2(1, 1)}),
+  sprite("attackField")
 ])
 
 player.play("idle");
@@ -102,7 +122,8 @@ export function Game(){
   loadBackground("grass", 0, -4310),
   loadBackground("grass", -7765, -4310),
   add(obunga),
-  add(player)
+  add(player),
+  add(playerAttackField)
   
 }
 
@@ -113,6 +134,8 @@ onKeyDown("d", ()=> {
     {
       player.play("runHorizontal");
     }
+    attackFieldConditionX = attackFieldPositionsX[0];
+    attackFieldConditionY = attackFieldPositionsY[2];
   });
   
   onKeyDown("a", ()=> {
@@ -122,6 +145,8 @@ onKeyDown("d", ()=> {
     {
       player.play("runHorizontal");
     }
+    attackFieldConditionX = attackFieldPositionsX[1];
+    attackFieldConditionY = attackFieldPositionsY[2];
   });
   
   onKeyDown("w", ()=> {
@@ -130,6 +155,8 @@ onKeyDown("d", ()=> {
     {
       player.play("runBackward");
     }
+    attackFieldConditionX = attackFieldPositionsX[2];
+    attackFieldConditionY = attackFieldPositionsY[0];
   });
   
   onKeyDown("s", ()=> {
@@ -139,6 +166,8 @@ onKeyDown("d", ()=> {
     {
       player.play("runForward");
     }
+    attackFieldConditionX = attackFieldPositionsX[2];
+    attackFieldConditionY = attackFieldPositionsY[1];
   });
   
   onKeyRelease("a", ()=>{
@@ -174,8 +203,10 @@ onKeyDown("d", ()=> {
   
 
   player.onUpdate(() => {
+    let attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
+      playerAttackField.pos = vec2(attackFieldPosition)
   })
   
   obunga.onUpdate( () =>{
@@ -190,6 +221,6 @@ onKeyDown("d", ()=> {
     debug.log("uhcuwhiwfwin")
   })
 
-  
+  debug.inspect = true
 
   export default  music;
