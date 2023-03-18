@@ -65,6 +65,7 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
 const music = play("overtaken", {
   volume: 0.5,
   loop: true,
+  paused: true
 });
 
 const player =  add([
@@ -102,6 +103,7 @@ export function Game(){
   loadBackground("grass", -7765, -4310),
   add(obunga),
   add(player)
+  
 }
 
 onKeyDown("d", ()=> {
@@ -163,11 +165,14 @@ onKeyDown("d", ()=> {
   onKeyPress("space", () => {  // <-------- !!!!!!!! Pause or unpause the music !!!!!!!!
     if (music.paused) {
       music.play()
+      music.paused = false;
     } else {
       music.paused = true
     }
   });
   
+  
+
   player.onUpdate(() => {
       // Set the viewport center to player.pos
       camPos(player.worldPos())
@@ -184,3 +189,7 @@ onKeyDown("d", ()=> {
   player.onClick(() => {
     debug.log("uhcuwhiwfwin")
   })
+
+  
+
+  export default  music;
