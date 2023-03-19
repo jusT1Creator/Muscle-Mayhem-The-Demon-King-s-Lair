@@ -1,13 +1,34 @@
 import k from "./kabam.js"
 import { Game } from "./Game.js";
+import music from "./Game.js";
 
 scene("game", Game)
+
+loadSound("StartMusic", "assets/Aot relaxing music.m4a")
+
+const Startmusic = play("StartMusic", {
+	volume: 1,
+	loop: true
+})
+
+loadSprite("Start_Screen", "assets/game_start_Screen_resized.png")
 
 
 
 export function Start(){
-    onUpdate(() => setCursor("default"))
-
+	add([
+		sprite("Start_Screen"),
+		pos(0, 0),
+		scale(width()/2048, height()/831),
+	]),
+    onUpdate(() => setCursor("default")),
+	onUpdate(()=>{
+		if (Startmusic.paused) {
+			debug.log("huedgsvuzfv")
+			Startmusic.play()
+		}
+		music.paused = true;
+	})
 function addButton(txt, p, f) {
 
 	// add a parent background object
@@ -51,7 +72,11 @@ function addButton(txt, p, f) {
 
 }
 
-addButton("Start", vec2(200, 100), () => go("game"))
+addButton("Start", vec2(200, 100), () => {
+	go("game")
+	music.paused = false;
+	Startmusic.paused = true;
+})
 addButton("Quit", vec2(200, 200), () => debug.log("bye"))
 
 }
