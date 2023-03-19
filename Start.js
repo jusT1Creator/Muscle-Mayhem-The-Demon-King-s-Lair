@@ -11,9 +11,16 @@ const Startmusic = play("StartMusic", {
 	loop: true
 })
 
+loadSprite("Start_Screen", "assets/game_start_Screen_resized.png")
+
 
 
 export function Start(){
+	add([
+		sprite("Start_Screen"),
+		pos(0, 0),
+		scale(width()/2048, height()/831),
+	]),
     onUpdate(() => setCursor("default")),
 	onUpdate(()=>{
 		if (Startmusic.paused) {

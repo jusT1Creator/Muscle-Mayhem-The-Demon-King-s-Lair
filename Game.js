@@ -34,6 +34,8 @@ loadSound("overtaken", "assets/Overtaken.m4a")
 
 loadSprite("attackField", "assets/Player_Attack_Field.png")
 
+loadSprite("ball", "assets/Ball.png")
+
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
   sliceY:6,
@@ -100,11 +102,45 @@ const player =  add([
  }
 ])
 
+
+
+
 const playerAttackField = add([
   pos(),
   area({scale: vec2(1, 1)}),
   sprite("attackField")
 ])
+
+let bISAttacking = false;
+playerAttackField.onCollideUpdate("enemy", (enemy)=>{
+ 
+    if(bISAttacking)
+    { 
+      enemy.hurt(50)
+      
+    }
+    bISAttacking = false;
+  
+})
+
+const enemy = add([
+  sprite("ball"),
+  area(),
+  pos(1000, 1000),
+  health(100),
+  "enemy"
+])
+
+// enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+enemy.onUpdate(()=>{
+  debug.log(enemy.worldPos())
+  debug.log(enemy.hp())
+  if(enemy.hp() <= 0){
+    destroy(enemy);
+  }
+})
 
 player.play("idle");
 const obunga = add([
@@ -123,7 +159,8 @@ export function Game(){
   loadBackground("grass", -7765, -4310),
   add(obunga),
   add(player),
-  add(playerAttackField)
+  add(playerAttackField),
+  add(enemy)
   
 }
 
@@ -213,8 +250,16 @@ onKeyDown("d", ()=> {
     obunga.move(0, 5)
   }) 
   
-  onMouseDown("left", ()=>{
+  function resetAttack(){
+    bISAttacking = false;
+  }
+
+  onMousePress("left", ()=>{
     player.play("punch");
+    bISAttacking = true;
+    wait(0.1, ()=>{
+      bISAttacking = false
+    })
   })
 
   player.onClick(() => {
