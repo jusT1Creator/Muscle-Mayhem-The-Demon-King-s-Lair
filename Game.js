@@ -22,6 +22,8 @@ function loadBackground(backgroundName, posX, posY){
 
 document.body.style.overflow = 'hidden';
 
+//sprites:
+
 loadSprite("grass", "assets/Grass_Background.png");
 
 loadSprite("obunga", "assets/OIP.png");
@@ -75,11 +77,15 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
 });
 
 
+
+//music;
 const music = play("overtaken", {
   volume: 0.5,
   loop: true,
   paused: true
 });
+
+//entities:
 
 const player =  add([
   z(5),
@@ -151,6 +157,7 @@ const obunga = add([
   }
 ])
 
+//scene
 
 export function Game(){
     loadBackground("grass", 0, 0),
@@ -163,6 +170,8 @@ export function Game(){
   add(enemy)
   
 }
+
+//input
 
 onKeyDown("d", ()=> {
     player.move(player.speed, 0);
@@ -266,6 +275,6 @@ onKeyDown("d", ()=> {
     debug.log("uhcuwhiwfwin")
   })
 
-  debug.inspect = true
+  //debug.inspect = true
 
   export default  music;
