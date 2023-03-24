@@ -143,9 +143,10 @@ const enemy = add([
 enemy.onUpdate(()=>{
   debug.log(enemy.worldPos())
   debug.log(enemy.hp())
-  if(enemy.hp() <= 0){
-    destroy(enemy);
-  }
+  enemy.on("death", () => {
+    debug.log(enemy.hp())
+    destroy(enemy)
+})
 })
 
 player.play("idle");
