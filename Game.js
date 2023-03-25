@@ -187,8 +187,8 @@ export function Game(){
   loadBackground("grass", -2, -2),
   add(obunga),
   add(player),
-  add(enemy),
-  add(playerAttackField)
+  add(enemy)
+ 
   
 }
 
@@ -281,7 +281,7 @@ onKeyDown("d", ()=> {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
-      playerAttackField.pos = vec2(attackFieldPosition)
+    
   })
   
   obunga.onUpdate( () =>{
@@ -294,7 +294,7 @@ onKeyDown("d", ()=> {
   }
 
   onMousePress("left", ()=>{
-    bISAttacking = true
+    
     Attack()
   })
 
@@ -314,7 +314,7 @@ onKeyDown("d", ()=> {
 
   function Attack(){
     comboState++
-    let Dmg;
+   
     if(comboState == 1){
       player.play("punch")
     }
@@ -329,30 +329,40 @@ onKeyDown("d", ()=> {
       player.play("airKickTwo")
     }
    
+    add(playerAttackField)
+    playerAttackField.pos = vec2(attackFieldPosition)
 
-    playerAttackField.onCollideUpdate("enemy", (enemy)=>{
-      if(bISAttacking){
-        if(comboState == 1){
-          Dmg = 5;
-        }
-        else if(comboState == 2){
-          Dmg = 7;
-        }
-        else if(comboState == 3){
-          Dmg = 10;
-        }
-        enemy.hurt(Dmg)
-      }
-      bISAttacking = false;
-  })
-  
     
     if(comboState >= 4){
       comboState = 0;
     }
 
-
+    wait(0.05, ()=>{
+      playerAttackField.destroy()
+      
+    })
    
   }
+
+
+ 
+
+  
+  playerAttackField.onCollide("enemy", (enemy)=>{
+    let Dmg = 15;
+    if(bISAttacking){
+      if(comboState == 1){
+        Dmg = 5;
+      }
+      else if(comboState == 2){
+        Dmg = 7;
+      }
+      else if(comboState == 3){
+        Dmg = 10;
+      }
+      enemy.hurt(Dmg)
+    }
+    bISAttacking = false;
+})
 
   
