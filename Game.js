@@ -146,24 +146,22 @@ const playerAttackField = add([
 let bISAttacking = false;
 
 
+function SpawnEnemies(posX, posY){
+  add([
+    sprite("ball"),
+    area(),
+    pos(posX, posY),
+    health(100),
+    "enemy"
+  ])
+}
 
-const enemy = add([
-  sprite("ball"),
-  area(),
-  pos(1000, 1000),
-  health(100),
-  "enemy"
-])
+
 
 // enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-enemy.onUpdate(()=>{
-  debug.log(enemy.hp());
-  if(enemy.hp() <= 0){
-    destroy(enemy);
-  }
-})
+
 
 player.play("idle");
 const obunga = add([
@@ -187,10 +185,20 @@ export function Game(){
   loadBackground("grass", -2, -2),
   add(obunga),
   add(player),
-  add(enemy)
+  SpawnEnemies(1000, 1000),
+  SpawnEnemies(500, 500),
  
+  onUpdate("enemy", (enemy)=>{
+ 
+    debug.log(enemy.hp());
+    if(enemy.hp() <= 0){
+      destroy(enemy);
+    }
+  })
   
 }
+
+
 
 //input
 
@@ -314,7 +322,7 @@ onKeyDown("d", ()=> {
 
   function Attack(){
     comboState++
-   
+   bISAttacking = true
     if(comboState == 1){
       player.play("punch")
     }
