@@ -10,11 +10,19 @@ let attackFieldConditionY = attackFieldPositionsY[2];
 
 
 function loadBackground(backgroundName, posX, posY){
-    add([
+
+
+    const grassbackground = add([
         sprite(backgroundName),
         scale(width()/450, height()/450),
-        pos(posX, posY)
+        pos(0, 0)
     ]);
+
+    let spawnPositionX = posX * grassbackground.scale.x;
+    let spawnPositionY = posY * grassbackground.scale.y;
+
+    grassbackground.pos.x = spawnPositionX * 2000
+    grassbackground.pos.y = spawnPositionY * 2000
  }
 
  
@@ -40,7 +48,7 @@ loadSprite("ball", "assets/Ball.png")
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
-  sliceY:6,
+  sliceY:9,
   anims:{
     idle:{
       from: 0,
@@ -70,7 +78,25 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       from: 20,
       to: 23,
       loop: false,
-      speed: 18,
+      speed: 12,
+    },
+    kick:{
+      from: 24,
+      to: 26,
+      loop: false,
+      speed:12
+    },
+    airKickOne:{
+      from: 27,
+      to:32,
+      loop: false,
+      speed: 12
+    },
+    airKickTwo:{
+      from: 33,
+      to: 35,
+      loop: false,
+      speed: 12
     }
   },
 
@@ -118,16 +144,8 @@ const playerAttackField = add([
 ])
 
 let bISAttacking = false;
-playerAttackField.onCollideUpdate("enemy", (enemy)=>{
- 
-    if(bISAttacking)
-    { 
-      enemy.hurt(50)
-      
-    }
-    bISAttacking = false;
-  
-})
+
+
 
 const enemy = add([
   sprite("ball"),
@@ -141,8 +159,7 @@ const enemy = add([
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 enemy.onUpdate(()=>{
-  debug.log(enemy.worldPos())
-  debug.log(enemy.hp())
+  debug.log(enemy.hp());
   if(enemy.hp() <= 0){
     destroy(enemy);
   }
@@ -161,13 +178,17 @@ const obunga = add([
 
 export function Game(){
     loadBackground("grass", 0, 0),
-  loadBackground("grass", -7765, 0),
-  loadBackground("grass", 0, -4310),
-  loadBackground("grass", -7765, -4310),
+  loadBackground("grass", -1, 0),
+  loadBackground("grass", 0, -1),
+  loadBackground("grass", -1, -1),
+  loadBackground("grass", 2, 0),
+  loadBackground("grass", -2, 0),
+  loadBackground("grass", 0, -2),
+  loadBackground("grass", -2, -2),
   add(obunga),
   add(player),
-  add(playerAttackField),
-  add(enemy)
+  add(enemy),
+  add(playerAttackField)
   
 }
 
@@ -182,6 +203,8 @@ onKeyDown("d", ()=> {
     }
     attackFieldConditionX = attackFieldPositionsX[0];
     attackFieldConditionY = attackFieldPositionsY[2];
+
+    resetAttack()
   });
   
   onKeyDown("a", ()=> {
@@ -193,6 +216,8 @@ onKeyDown("d", ()=> {
     }
     attackFieldConditionX = attackFieldPositionsX[1];
     attackFieldConditionY = attackFieldPositionsY[2];
+
+    resetAttack()
   });
   
   onKeyDown("w", ()=> {
@@ -203,6 +228,8 @@ onKeyDown("d", ()=> {
     }
     attackFieldConditionX = attackFieldPositionsX[2];
     attackFieldConditionY = attackFieldPositionsY[0];
+
+    resetAttack()
   });
   
   onKeyDown("s", ()=> {
@@ -214,6 +241,8 @@ onKeyDown("d", ()=> {
     }
     attackFieldConditionX = attackFieldPositionsX[2];
     attackFieldConditionY = attackFieldPositionsY[1];
+
+    resetAttack()
   });
   
   onKeyRelease("a", ()=>{
@@ -246,10 +275,10 @@ onKeyDown("d", ()=> {
     }
   });
   
-  
+  let attackFieldPosition
 
   player.onUpdate(() => {
-    let attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
+    attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
       playerAttackField.pos = vec2(attackFieldPosition)
@@ -261,20 +290,69 @@ onKeyDown("d", ()=> {
   
   function resetAttack(){
     bISAttacking = false;
+    comboState = 0;
   }
 
   onMousePress("left", ()=>{
-    player.play("punch");
-    bISAttacking = true;
-    wait(0.1, ()=>{
-      bISAttacking = false
-    })
+    bISAttacking = true
+    Attack()
   })
 
   player.onClick(() => {
     debug.log("uhcuwhiwfwin")
   })
 
-  //debug.inspect = true
+  debug.inspect = true
 
   export default  music;
+
+  let comboState = 0;
+
+  
+
+
+
+  function Attack(){
+    comboState++
+    let Dmg;
+    if(comboState == 1){
+      player.play("punch")
+    }
+    else if(comboState == 2){
+     
+      player.play("kick")
+    }
+    else if(comboState == 3){
+      player.play("airKickOne")
+    }
+    else if(comboState == 4){
+      player.play("airKickTwo")
+    }
+   
+
+    playerAttackField.onCollideUpdate("enemy", (enemy)=>{
+      if(bISAttacking){
+        if(comboState == 1){
+          Dmg = 5;
+        }
+        else if(comboState == 2){
+          Dmg = 7;
+        }
+        else if(comboState == 3){
+          Dmg = 10;
+        }
+        enemy.hurt(Dmg)
+      }
+      bISAttacking = false;
+  })
+  
+    
+    if(comboState >= 4){
+      comboState = 0;
+    }
+
+
+   
+  }
+
+  
