@@ -140,7 +140,8 @@ const player =  add([
 const playerAttackField = add([
   pos(),
   area({scale: vec2(1, 1)}),
-  sprite("attackField")
+  sprite("attackField"),
+  "attackField"
 ])
 
 let bISAttacking = false;
@@ -297,7 +298,6 @@ onKeyDown("d", ()=> {
   }) 
   
   function resetAttack(){
-    bISAttacking = false;
     comboState = 0;
   }
 
@@ -319,46 +319,59 @@ onKeyDown("d", ()=> {
   
 
 
+let isCollidingWithEnemy = false
+let attackedEnemy
+
+  playerAttackField.onCollideUpdate("enemy", (enemy)=>{
+   isCollidingWithEnemy = true
+   attackedEnemy = enemy
+  })
+
+  
+
 
   function Attack(){
-    comboState++
-   bISAttacking = true
-    if(comboState == 1){
-      player.play("punch")
-    }
-    else if(comboState == 2){
-     
-      player.play("kick")
-    }
-    else if(comboState == 3){
-      player.play("airKickOne")
-    }
-    else if(comboState == 4){
-      player.play("airKickTwo")
-    }
+   comboState++
+   HorizontalAnimation()
    
-    add(playerAttackField)
-    playerAttackField.pos = vec2(attackFieldPosition)
-
-    
     if(comboState >= 4){
       comboState = 0;
     }
 
-    wait(0.05, ()=>{
-      playerAttackField.destroy()
-      
-    })
-   
+    
   }
 
+  function HorizontalAnimation(){
+    if(comboState == 1){
+      player.play("punch",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    else if(comboState == 2){
+     
+      player.play("kick",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    else if(comboState == 3){
+      player.play("airKickOne",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    else if(comboState == 4){
+      player.play("airKickTwo",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+  }
 
- 
+  function ManageAttackField(){
+    add(playerAttackField)
+    playerAttackField.pos = vec2(attackFieldPosition)
 
-  
-  playerAttackField.onCollide("enemy", (enemy)=>{
-    let Dmg = 15;
-    if(bISAttacking){
+    if(isCollidingWithEnemy){
+      let Dmg = 15;
+    
       if(comboState == 1){
         Dmg = 5;
       }
@@ -368,9 +381,16 @@ onKeyDown("d", ()=> {
       else if(comboState == 3){
         Dmg = 10;
       }
-      enemy.hurt(Dmg)
+      attackedEnemy.hurt(Dmg)
     }
-    bISAttacking = false;
-})
+    wait(0.1, ()=>{
+      playerAttackField.destroy()
+    })
+   
+  }
 
+  
+ 
+
+  
   
