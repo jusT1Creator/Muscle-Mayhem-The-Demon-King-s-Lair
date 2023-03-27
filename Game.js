@@ -28,7 +28,20 @@ loadSprite("grass", "assets/Grass_Background.png");
 
 loadSprite("obunga", "assets/OIP.png");
 
-loadSprite("player", "assets/Ball.png");
+loadSprite("ded", "assets/ded.png")
+
+loadSprite("explode", "assets/kaboom.png",{
+  sliceX:5,
+  sliceY:5,
+  anims:{
+    animation:{
+      from: 0,
+      to: 24,
+      loop: false,
+      speed: 5,
+    }
+  }
+})
 
 loadSound("music", "assets/Bruce wang.m4a")
 
@@ -128,12 +141,16 @@ playerAttackField.onCollideUpdate("enemy", (enemy)=>{
     bISAttacking = false;
   
 })
-
+let enemies = []
+function SpawnEnemy(enemyNumber, posX, posY){
+   
+}
 const enemy = add([
   sprite("ball"),
   area(),
   pos(1000, 1000),
   health(100),
+  anchor("center"),
   "enemy"
 ])
 
@@ -145,7 +162,18 @@ enemy.onUpdate(()=>{
   debug.log(enemy.hp())
   enemy.on("death", () => {
     debug.log(enemy.hp())
-    destroy(enemy)
+    enemy.use(sprite("explode", {
+    }))
+    enemy.play("animation")
+    wait(5, ()=>{
+      enemy.use(sprite("ded", {
+        width: 40
+      }))
+    wait(1, ()=>{
+      enemy.destroy()
+    })
+    })
+    
 })
 })
 
