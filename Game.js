@@ -50,7 +50,7 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
   sliceY:9,
   anims:{
-    idle:{
+    idleplayer:{
       from: 0,
       to: 3,
       loop : true,
@@ -185,10 +185,10 @@ function SpawnEnemies(posX, posY){
     area(),
     pos(posX, posY),
     health(100),
+    state("move", [ "idle", "attack", "move" ]),
     "enemy"
   ])
 }
-
 
 
 // enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
@@ -196,7 +196,7 @@ function SpawnEnemies(posX, posY){
 
 
 
-player.play("idle");
+player.play("idleplayer");
 const obunga = add([
   sprite("obunga"),
   pos(0, -275),
@@ -227,11 +227,98 @@ export function Game(){
     if(enemy.hp() <= 0){
       destroy(enemy);
     }
-  })
+
+    enemy.onStateEnter("idle", async () => {
+      await wait(0.5)
+      enemy.enterState("attack")
+    })
+
+    //   // When we enter "attack" state, we fire a bullet, and enter "move" state after 1 sec
+    // enemy.onStateEnter("attack", async () => {
+
+    // // Don't do anything if player doesn't exist anymore
+    //   if (player.exists()) {
+    //     add([
+    //       pos(enemy.pos),
+    //       move(dir, BULLET_SPEED),
+    //       rect(12, 12),
+    //       area(),
+    //       offscreen({ destroy: true }),
+    //       anchor("center"),
+    //       color(BLUE),
+    //       "bullet",
+    //     ])
+
+    //   }
+
+    //   await wait(1)
+    //   enemy.enterState("move")
+
+    // })
+
+    // enemy.onStateEnter("move", async () => {
+    //   await wait(2)
+    //   enemy.enterState("idle")
+    // })
+
+    // enemy.onStateUpdate("move", () => {
+    //   if (!player.exists()) return
+    //   const dir = player.pos.sub(enemy.pos).unit()
+    //   enemy.move(dir.scale(ENEMY_SPEED))
+    // })
   
-}
+  })
+
+//   
+  loadSprite("ghosty", "/assets/ball.png")
+
+  const SPEED = 320
+  const ENEMY_SPEED = 160
+  const BULLET_SPEED = 800
+
+  // Run the callback once every time we enter "idle" state.
+  // Here we stay "idle" for 0.5 second, then enter "attack" state.
 
 
+  // When we enter "attack" state, we fire a bullet, and enter "move" state after 1 sec
+  enemy.onStateEnter("attack", async () => {
+
+    // Don't do anything if player doesn't exist anymore
+    if (player.exists()) {
+
+      const dir = player.pos.sub(enemy.pos).unit()
+
+      add([
+        pos(enemy.pos),
+        move(dir, BULLET_SPEED),
+        rect(12, 12),
+        area(),
+        offscreen({ destroy: true }),
+        anchor("center"),
+        color(BLUE),
+        "bullet",
+      ])
+
+    }
+
+    await wait(1)
+    enemy.enterState("move")
+
+  })
+
+  enemy.onStateEnter("move", async () => {
+    await wait(2)
+    enemy.enterState("idle")
+  })
+
+  enemy.onStateUpdate("move", () => {
+    if (!player.exists()) return
+    const dir = player.pos.sub(enemy.pos).unit()
+    enemy.move(dir.scale(ENEMY_SPEED))
+  })
+ 
+  
+} 
 
 //input
 
@@ -300,19 +387,19 @@ onKeyDown("d", ()=> {
   });
   
   onKeyRelease("a", ()=>{
-    player.play("idle")
+    player.play("idleplayer")
   })
   
   onKeyRelease("d", ()=>{
-    player.play("idle")
+    player.play("idleplayer")
   })
   
   onKeyRelease("w", ()=>{
-    player.play("idle")
+    player.play("idleplayer")
   })
   
   onKeyRelease("s", ()=>{
-    player.play("idle")
+    player.play("idleplayer")
   })
   
   onKeyPress("s", ()=>{
