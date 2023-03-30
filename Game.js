@@ -90,7 +90,7 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       from: 27,
       to:32,
       loop: false,
-      speed: 12
+      speed: 15
     },
     airKickTwo:{
       from: 33,
@@ -102,6 +102,38 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
 
 });
 
+
+loadSprite("Vertical_Attacks", "assets/Vertical_attacks.png", {
+  sliceX:5,
+  sliceY:5,
+  anims:{
+    downAttackOne:{
+      from: 0,
+      to: 5,
+      loop: false,
+      speed:18
+    },
+    downAttackTwo:{
+      from: 6,
+      to: 10,
+      loop: false,
+      speed: 18
+    },
+    upAttackOne:{
+      from: 11,
+      to: 16,
+      loop: false,
+      speed: 15
+    },
+    upAttackTwo:{
+      from: 17,
+      to:  20,
+      loop: false,
+      speed: 15
+    }
+
+  }
+})
 
 
 //music;
@@ -124,6 +156,7 @@ const player =  add([
     scale: vec2(0.5, 1),
     offset: vec2(80, 0)
   }),
+  state("leftRight", ["leftRight", "up", "down"]),
   // Plain strings are tags, a quicker way to let us define behaviors for a group
   "player",
   "friendly",
@@ -140,30 +173,28 @@ const player =  add([
 const playerAttackField = add([
   pos(),
   area({scale: vec2(1, 1)}),
-  sprite("attackField")
+  sprite("attackField"),
+  "attackField"
 ])
 
-let bISAttacking = false;
 
 
+function SpawnEnemies(posX, posY){
+  add([
+    sprite("ball"),
+    area(),
+    pos(posX, posY),
+    health(100),
+    "enemy"
+  ])
+}
 
-const enemy = add([
-  sprite("ball"),
-  area(),
-  pos(1000, 1000),
-  health(100),
-  "enemy"
-])
+
 
 // enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-enemy.onUpdate(()=>{
-  debug.log(enemy.hp());
-  if(enemy.hp() <= 0){
-    destroy(enemy);
-  }
-})
+
 
 player.play("idle");
 const obunga = add([
@@ -187,14 +218,25 @@ export function Game(){
   loadBackground("grass", -2, -2),
   add(obunga),
   add(player),
-  add(enemy),
-  add(playerAttackField)
+  SpawnEnemies(1000, 1000),
+  SpawnEnemies(500, 500),
+ 
+  onUpdate("enemy", (enemy)=>{
+ 
+    debug.log(enemy.hp());
+    if(enemy.hp() <= 0){
+      destroy(enemy);
+    }
+  })
   
 }
+
+
 
 //input
 
 onKeyDown("d", ()=> {
+  resetAttack()
     player.move(player.speed, 0);
     player.flipX = false
     if(player.curAnim() != "runHorizontal")
@@ -204,10 +246,14 @@ onKeyDown("d", ()=> {
     attackFieldConditionX = attackFieldPositionsX[0];
     attackFieldConditionY = attackFieldPositionsY[2];
 
-    resetAttack()
+    player.enterState("leftRight");
+
+
+   
   });
   
   onKeyDown("a", ()=> {
+    resetAttack()
     player.move(-player.speed, 0);
     player.flipX = true
     if(player.curAnim() != "runHorizontal")
@@ -217,10 +263,13 @@ onKeyDown("d", ()=> {
     attackFieldConditionX = attackFieldPositionsX[1];
     attackFieldConditionY = attackFieldPositionsY[2];
 
-    resetAttack()
+    player.enterState("leftRight");
+
+    
   });
   
   onKeyDown("w", ()=> {
+    resetAttack()
     player.move(0, -player.speed);
     if(player.curAnim() != "runHorizontal" && player.curAnim() != "runBackward") // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
     {
@@ -229,10 +278,13 @@ onKeyDown("d", ()=> {
     attackFieldConditionX = attackFieldPositionsX[2];
     attackFieldConditionY = attackFieldPositionsY[0];
 
-    resetAttack()
+    player.enterState("up");
+
+    
   });
   
   onKeyDown("s", ()=> {
+    resetAttack()
     player.move(0, player.speed);
     
     if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward") // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
@@ -242,7 +294,9 @@ onKeyDown("d", ()=> {
     attackFieldConditionX = attackFieldPositionsX[2];
     attackFieldConditionY = attackFieldPositionsY[1];
 
-    resetAttack()
+    player.enterState("down");
+
+   
   });
   
   onKeyRelease("a", ()=>{
@@ -261,7 +315,18 @@ onKeyDown("d", ()=> {
     player.play("idle")
   })
   
-  
+  onKeyPress("s", ()=>{
+    player.use(sprite("Bruce_Wang"))
+  })
+  onKeyPress("w", ()=>{
+    player.use(sprite("Bruce_Wang"))
+  })
+  onKeyPress("a", ()=>{
+    player.use(sprite("Bruce_Wang"))
+  })
+  onKeyPress("d", ()=>{
+    player.use(sprite("Bruce_Wang"))
+  })
   
   
   
@@ -281,7 +346,7 @@ onKeyDown("d", ()=> {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
-      playerAttackField.pos = vec2(attackFieldPosition)
+    
   })
   
   obunga.onUpdate( () =>{
@@ -289,12 +354,12 @@ onKeyDown("d", ()=> {
   }) 
   
   function resetAttack(){
-    bISAttacking = false;
-    comboState = 0;
+    comboStateHorizontal = 0;
+    comboStateDown = 0;
+    comboStateUp = 0;
   }
 
   onMousePress("left", ()=>{
-    bISAttacking = true
     Attack()
   })
 
@@ -306,53 +371,153 @@ onKeyDown("d", ()=> {
 
   export default  music;
 
-  let comboState = 0;
+  let comboStateHorizontal = 0;
+  let comboStateUp = 0;
+  let comboStateDown = 0;
 
   
 
+
+let isCollidingWithEnemy = false
+let attackedEnemy
+
+  playerAttackField.onCollideUpdate("enemy", (enemy)=>{
+   isCollidingWithEnemy = true
+   attackedEnemy = enemy
+  })
+
+  
 
 
   function Attack(){
-    comboState++
-    let Dmg;
-    if(comboState == 1){
-      player.play("punch")
-    }
-    else if(comboState == 2){
-     
-      player.play("kick")
-    }
-    else if(comboState == 3){
-      player.play("airKickOne")
-    }
-    else if(comboState == 4){
-      player.play("airKickTwo")
-    }
-   
 
-    playerAttackField.onCollideUpdate("enemy", (enemy)=>{
-      if(bISAttacking){
-        if(comboState == 1){
-          Dmg = 5;
-        }
-        else if(comboState == 2){
-          Dmg = 7;
-        }
-        else if(comboState == 3){
-          Dmg = 10;
-        }
-        enemy.hurt(Dmg)
+    if(player.state === "down" || player.state === "up"){
+      player.use(sprite("Vertical_Attacks"))
+    }
+
+    if(player.state === "leftRight"){
+      comboStateHorizontal++
+      HorizontalAnimation()
+      
+       if(comboStateHorizontal >= 4){
+         comboStateHorizontal = 0;
+       }   
+    } else if(player.state === "down"){
+      comboStateDown++
+      downAttackAnimation()
+
+      if(comboStateDown >= 2){
+        comboStateDown = 0;
       }
-      bISAttacking = false;
-  })
-  
-    
-    if(comboState >= 4){
-      comboState = 0;
+    } else if(player.state === "up"){
+      comboStateUp++
+      upAttackAnimation()
+      if(comboStateUp >= 2){
+        comboStateUp = 0
+      }
+    }
+  }
+
+
+
+  function downAttackAnimation(){
+    if(comboStateDown == 1){
+      player.play("downAttackOne",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    if(comboStateDown == 2){
+      player.play("downAttackTwo",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+  }
+
+  function upAttackAnimation(){
+    if(comboStateUp == 1){
+      player.play("upAttackOne",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    if(comboStateUp == 2){
+      player.play("upAttackTwo",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+  }
+
+
+
+  function HorizontalAnimation(){
+    if(comboStateHorizontal == 1){
+      player.play("punch",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    else if(comboStateHorizontal == 2){
+     
+      player.play("kick",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    else if(comboStateHorizontal == 3){
+      player.play("airKickOne",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+    else if(comboStateHorizontal == 4){
+      player.play("airKickTwo",{
+        onEnd: ()=> ManageAttackField()
+      })
+    }
+  }
+
+  function ManageAttackField(){
+    add(playerAttackField)
+    playerAttackField.pos = vec2(attackFieldPosition)
+
+    if(isCollidingWithEnemy){
+      let Dmg = 15;
+    if(player.state === "leftRight")
+    {
+      if(comboStateHorizontal == 1){
+        Dmg = 5;
+      }
+      else if(comboStateHorizontal == 2){
+        Dmg = 7;
+      }
+      else if(comboStateHorizontal == 3){
+        Dmg = 10;
+      }
+    }
+
+    if(player.state === "down" ){
+      if(comboStateDown == 1){
+        Dmg = 10;
+      }
+    }
+
+    if( player.state === "up"){
+      if(comboStateUp == 1){
+        Dmg = 10;
+      }
     }
 
 
+      attackedEnemy.hurt(Dmg)
+
+
+
+
+    }
+    wait(0.01, ()=>{
+      playerAttackField.destroy()
+    })
    
   }
 
+  
+ 
+
+  
   
