@@ -38,7 +38,7 @@ loadSprite("explode", "assets/kaboom.png",{
       from: 0,
       to: 24,
       loop: false,
-      speed: 5,
+      speed: 100,
     }
   }
 })
@@ -165,7 +165,7 @@ enemy.onUpdate(()=>{
     enemy.use(sprite("explode", {
     }))
     enemy.play("animation")
-    wait(5, ()=>{
+    wait(0.5, ()=>{
       enemy.use(sprite("ded", {
         width: 40
       }))
