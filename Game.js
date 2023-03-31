@@ -1,7 +1,7 @@
 import k from "./kabam.js"
 
 
-let attackFieldPositionsX = [120, -50, 40];
+let attackFieldPositionsX = [70, -70, 0];
 let attackFieldPositionsY = [-100, 100, 0];
 let attackFieldConditionX = attackFieldPositionsX[0];
 let attackFieldConditionY = attackFieldPositionsY[2];
@@ -163,12 +163,12 @@ const player =  add([
     frame: 0,
   }),
   pos(),
-  health(8),
+  health(100),
   area({ 
-    scale: vec2(0.5, 1),
-    offset: vec2(80, 0)
+    scale: vec2(0.5, 1)
   }),
   state("leftRight", ["leftRight", "up", "down"]),
+  anchor("center"),
   // Plain strings are tags, a quicker way to let us define behaviors for a group
   "player",
   "friendly",
@@ -186,6 +186,7 @@ const playerAttackField = add([
   pos(),
   area({scale: vec2(1, 1)}),
   sprite("attackField"),
+  anchor("center"),
   "attackField"
 ])
 
@@ -196,11 +197,14 @@ function SpawnEnemies(posX, posY){
     sprite("slime",{
       anim: "runForward"
     }),
-    area(),
+    area({ 
+      scale: vec2(0.5, 0.5),
+      offset: vec2(-10, 35)
+    }),
     scale(vec2(5, 5)),
     pos(posX, posY),
     health(100),
-    
+    anchor("center"),
     "enemy"
   ])
 }
@@ -238,8 +242,11 @@ export function Game(){
   SpawnEnemies(500, 500),
  
   onUpdate("enemy", (enemy)=>{
- 
-    debug.log(enemy.hp());
+    const dir = player.pos.sub(enemy.pos).unit()
+    if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
+      enemy.move(dir.scale(200))
+    }
+   
     if(enemy.hp() <= 0){
       destroy(enemy);
     }
@@ -365,8 +372,15 @@ onKeyDown("d", ()=> {
     
   })
   
+  let Obungaspeed = 20;
+
   obunga.onUpdate( () =>{
-    obunga.move(0, 5)
+   
+    if(player.pos.y - obunga.pos.y > 4000 || player.pos.y - obunga.pos.y < -4000 || player.pos.x - obunga.pos.x > 4000 || player.pos.x - obunga.pos.x < -4000){
+      Obungaspeed = 10000;
+    }
+    const dir = player.pos.sub(obunga.pos).unit()
+    obunga.move(dir.scale(Obungaspeed))
   }) 
   
   function resetAttack(){
