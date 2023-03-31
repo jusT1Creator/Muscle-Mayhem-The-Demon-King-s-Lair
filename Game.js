@@ -135,6 +135,18 @@ loadSprite("Vertical_Attacks", "assets/Vertical_attacks.png", {
   }
 })
 
+loadSprite("slime", "assets/Slime_Jump_Forward_Sprite.png",{
+  sliceX: 12,
+  sliceY: 1,
+  anims:{
+    runForward:{
+    from: 0,
+    to: 11,
+    loop: true,
+    speed: 12
+  }
+}
+})
 
 //music;
 const music = play("overtaken", {
@@ -181,10 +193,14 @@ const playerAttackField = add([
 
 function SpawnEnemies(posX, posY){
   add([
-    sprite("ball"),
+    sprite("slime",{
+      anim: "runForward"
+    }),
     area(),
+    scale(vec2(5, 5)),
     pos(posX, posY),
     health(100),
+    
     "enemy"
   ])
 }
@@ -369,7 +385,7 @@ onKeyDown("d", ()=> {
 
   debug.inspect = true
 
-  export default  music;
+  
 
   let comboStateHorizontal = 0;
   let comboStateUp = 0;
@@ -516,7 +532,7 @@ let attackedEnemy
    
   }
 
-  
+  export default  music;
  
 
   
