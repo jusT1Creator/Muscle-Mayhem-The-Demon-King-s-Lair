@@ -148,6 +148,36 @@ loadSprite("slime", "assets/Slime_Jump_Forward_Sprite.png",{
 }
 })
 
+//components
+
+function enemyAttack(){
+  let bCanAttack = true;
+  return{
+    attack(position)
+    {
+      if(bCanAttack)
+      { 
+      const enemyAttackField = add([
+      pos(position),
+      area({scale: vec2(8, 4)}),
+      sprite("attackField"),
+      anchor("center"),
+     "enemyAttackField"
+        ])
+    bCanAttack = false;
+    enemyAttackField.onCollide("player", ()=>{
+      player.hurt(10);
+        })
+  
+    wait(0.1, ()=>{
+      enemyAttackField.destroy()
+        })
+      }
+    }
+
+  }
+}
+
 //music;
 const music = play("overtaken", {
   volume: 0.5,
@@ -191,7 +221,6 @@ const playerAttackField = add([
 ])
 
 
-
 function SpawnEnemies(posX, posY){
   add([
     sprite("slime",{
@@ -205,6 +234,8 @@ function SpawnEnemies(posX, posY){
     pos(posX, posY),
     health(100),
     anchor("center"),
+    enemyAttack(),
+    state("idle", ["idle", "attack"]),
     "enemy"
   ])
 }
@@ -245,14 +276,26 @@ export function Game(){
     const dir = player.pos.sub(enemy.pos).unit()
     if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
       enemy.move(dir.scale(200))
+    } else{
+      
+        enemy.enterState("attack")
+    
     }
+
+    enemy.onStateEnter("attack", async () => {
+      enemy.attack(enemy.pos);
+
+     
+    })
+   
+    debug.log(player.hp())
    
     if(enemy.hp() <= 0){
       destroy(enemy);
     }
   })
-  
-}
+}                             
+
 
 
 
