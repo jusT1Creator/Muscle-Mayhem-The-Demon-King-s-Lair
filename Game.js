@@ -172,9 +172,11 @@ function enemyAttack(){
     wait(0.1, ()=>{
       enemyAttackField.destroy()
         })
+    wait(2, ()=>{
+      bCanAttack = true
+    })
       }
     }
-
   }
 }
 
@@ -208,6 +210,7 @@ const player =  add([
       speed: 700
  }
 ])
+
 
 
 
@@ -277,16 +280,9 @@ export function Game(){
     if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
       enemy.move(dir.scale(200))
     } else{
-      
-        enemy.enterState("attack")
-    
+     enemy.attack(enemy.pos)
     }
 
-    enemy.onStateEnter("attack", async () => {
-      enemy.attack(enemy.pos);
-
-     
-    })
    
     debug.log(player.hp())
    
@@ -412,6 +408,10 @@ onKeyDown("d", ()=> {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
+
+      if(player.hp() <= 0){
+        player.destroy()
+      }
     
   })
   
