@@ -6,7 +6,7 @@ let attackFieldPositionsY = [-100, 100, 0];
 let attackFieldConditionX = attackFieldPositionsX[0];
 let attackFieldConditionY = attackFieldPositionsY[2];
 
-
+//debug.inspect = true
 
 
 function loadBackground(backgroundName, posX, posY){
@@ -167,6 +167,7 @@ function enemyAttack(){
     bCanAttack = false;
     enemyAttackField.onCollide("player", ()=>{
       player.hurt(10);
+      player.moveBy(10, 10)
         })
   
     wait(0.1, ()=>{
@@ -272,6 +273,7 @@ export function Game(){
   loadBackground("grass", -2, -2),
   add(obunga),
   add(player),
+  add(playerAttackField),
   SpawnEnemies(1000, 1000),
   SpawnEnemies(500, 500),
  
@@ -408,7 +410,7 @@ onKeyDown("d", ()=> {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
-
+      playerAttackField.pos = vec2(attackFieldPosition)
       if(player.hp() <= 0){
         player.destroy()
       }
@@ -440,7 +442,7 @@ onKeyDown("d", ()=> {
     debug.log("uhcuwhiwfwin")
   })
 
-  debug.inspect = true
+ 
 
   
 
@@ -455,8 +457,12 @@ let isCollidingWithEnemy = false
 let attackedEnemy
 
   playerAttackField.onCollideUpdate("enemy", (enemy)=>{
+    attackedEnemy = enemy
    isCollidingWithEnemy = true
-   attackedEnemy = enemy
+  })
+
+  playerAttackField.onCollideEnd("enemy", ()=>{
+    attackedEnemy = null
   })
 
   
@@ -496,12 +502,12 @@ let attackedEnemy
   function downAttackAnimation(){
     if(comboStateDown == 1){
       player.play("downAttackOne",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     if(comboStateDown == 2){
       player.play("downAttackTwo",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
   }
@@ -509,12 +515,12 @@ let attackedEnemy
   function upAttackAnimation(){
     if(comboStateUp == 1){
       player.play("upAttackOne",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     if(comboStateUp == 2){
       player.play("upAttackTwo",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
   }
@@ -524,43 +530,45 @@ let attackedEnemy
   function HorizontalAnimation(){
     if(comboStateHorizontal == 1){
       player.play("punch",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     else if(comboStateHorizontal == 2){
      
       player.play("kick",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     else if(comboStateHorizontal == 3){
       player.play("airKickOne",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     else if(comboStateHorizontal == 4){
       player.play("airKickTwo",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
   }
 
-  function ManageAttackField(){
-    add(playerAttackField)
-    playerAttackField.pos = vec2(attackFieldPosition)
-
+  function ManageAttackEffects(){
+    
+    let knockBackForce = 6;
     if(isCollidingWithEnemy){
       let Dmg = 15;
     if(player.state === "leftRight")
     {
       if(comboStateHorizontal == 1){
         Dmg = 5;
+        knockBackForce = 1
       }
       else if(comboStateHorizontal == 2){
         Dmg = 7;
+        knockBackForce = 1
       }
       else if(comboStateHorizontal == 3){
         Dmg = 10;
+        knockBackForce = 4
       }
     }
 
@@ -577,15 +585,40 @@ let attackedEnemy
     }
 
 
-      attackedEnemy.hurt(Dmg)
+      
 
+      let knockbackX
+      let knockbackY
 
+      if(attackFieldConditionX == 0){
+        knockbackX = 0
+      }else if(attackFieldConditionX < 0)
+      {
+        knockbackX = -100
+      }else{
+        knockbackX = 100
+      }
 
+      if(attackFieldConditionY == 0){
+        knockbackY = 0
+      }else if(attackFieldConditionY < 0)
+      {
+        knockbackY = -100
+      }else{
+        knockbackY = 100
+      }
 
+      knockbackX *= knockBackForce
+
+      let knockBack = vec2(knockbackX, knockbackY)
+      
+      if(attackedEnemy != null){
+        attackedEnemy.hurt(Dmg)
+        attackedEnemy.moveBy(knockBack)  
+      }
+     
     }
-    wait(0.01, ()=>{
-      playerAttackField.destroy()
-    })
+   
    
   }
 
