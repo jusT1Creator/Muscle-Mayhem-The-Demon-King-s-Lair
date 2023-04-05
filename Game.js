@@ -184,6 +184,8 @@ function enemyAttack(){
   }
 }
 
+
+
 //music;
 const music = play("overtaken", {
   volume: 0.5,
@@ -215,6 +217,22 @@ const player =  add([
  }
 ])
 
+const healthBarVisualisationAssistant = player.add([
+  rect(player.hp() * 3, 25),
+  color(170, 170, 170),
+  pos(-700, 300),
+])
+
+
+const healthBar = player.add([
+  rect(player.hp() * 3, 25),
+  pos(-700, 300),
+  color(255, 0, 0)
+])
+
+healthBar.add([
+  text("hp:", {size: 25})
+])
 
 
 
@@ -229,7 +247,7 @@ const playerAttackField = add([
 
 
 function SpawnEnemies(posX, posY){
-  add([
+  const slime = add([
     sprite("slime",{
       anim: "runForward"
     }),
@@ -242,12 +260,26 @@ function SpawnEnemies(posX, posY){
     health(100),
     anchor("center"),
     enemyAttack(),
+    enemyHealthBar(),
     state("idle", ["idle", "attack"]),
     "enemy"
   ])
+  slime.healthBar(slime)
 }
 
-
+  function enemyHealthBar(){
+    let healthBar
+    let healthBarSize
+    return{
+      healthBar(enemy){
+        healthBar = enemy.add([rect(10, 1), pos(0, 0), color(255, 0,0)])
+      }, healthBarActualisation(enemy){
+        healthBarSize = enemy.hp() / 10
+        healthBar.width = healthBarSize;
+      }
+    }
+  }
+  
 
 // enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -265,8 +297,16 @@ const obunga = add([
 
 //scene
 
+function resetPlayerHealth(){
+  let ValueToReset = 100 - player.hp();
+  player.heal(ValueToReset);
+}
+
 export function Game(){
-    loadBackground("grass", 0, 0),
+  bHasLost = false
+  player.pos = vec2(0,0),
+  resetPlayerHealth(),
+  loadBackground("grass", 0, 0),
   loadBackground("grass", -1, 0),
   loadBackground("grass", 0, -1),
   loadBackground("grass", -1, -1),
@@ -281,6 +321,7 @@ export function Game(){
   SpawnEnemies(500, 500),
  
   onUpdate("enemy", (enemy)=>{
+    enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
     if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
       enemy.move(dir.scale(200))
@@ -288,12 +329,17 @@ export function Game(){
      enemy.attack(enemy.pos)
     }
 
-   
-    debug.log(player.hp())
+  
    
     if(enemy.hp() <= 0){
       destroy(enemy);
     }
+
+    if(bHasLost){
+      go("gameOver")
+    }
+    
+    healthBar.width = player.hp() * 3
   })
 }                             
 
@@ -301,6 +347,12 @@ export function Game(){
 
 
 //input
+
+onKeyPress("enter", ()=> {
+ for(let i = 1; i < 500; i++){ 
+  SpawnEnemies(i* 100 , i* 100)
+}
+})
 
 onKeyDown("d", ()=> {
   resetAttack()
@@ -409,16 +461,19 @@ onKeyDown("d", ()=> {
   
   let attackFieldPosition
   let bHasLost
+
+  player.on("death", () => {
+    bHasLost = true
+    player.destroy()
+  })
+
+
   player.onUpdate(() => {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
       playerAttackField.pos = vec2(attackFieldPosition)
-      if(player.hp() <= 0){
-        go("gameOver")
-        player.destroy()
-      }
-    
+      
   })
   
   let Obungaspeed = 20;
