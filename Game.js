@@ -1,12 +1,15 @@
 import k from "./kabam.js"
+import { GameOver } from "./GameOver.js";
 
+
+scene("gameOver", GameOver)
 
 let attackFieldPositionsX = [70, -70, 0];
 let attackFieldPositionsY = [-100, 100, 0];
 let attackFieldConditionX = attackFieldPositionsX[0];
 let attackFieldConditionY = attackFieldPositionsY[2];
 
-
+//debug.inspect = true
 
 
 function loadBackground(backgroundName, posX, posY){
@@ -167,6 +170,7 @@ function enemyAttack(){
     bCanAttack = false;
     enemyAttackField.onCollide("player", ()=>{
       player.hurt(10);
+      player.moveBy(10, 10)
         })
   
     wait(0.1, ()=>{
@@ -179,6 +183,8 @@ function enemyAttack(){
     }
   }
 }
+
+
 
 //music;
 const music = play("overtaken", {
@@ -211,6 +217,22 @@ const player =  add([
  }
 ])
 
+const healthBarVisualisationAssistant = player.add([
+  rect(player.hp() * 3, 25),
+  color(170, 170, 170),
+  pos(-700, 300),
+])
+
+
+const healthBar = player.add([
+  rect(player.hp() * 3, 25),
+  pos(-700, 300),
+  color(255, 0, 0)
+])
+
+healthBar.add([
+  text("hp:", {size: 25})
+])
 
 
 
@@ -225,7 +247,7 @@ const playerAttackField = add([
 
 
 function SpawnEnemies(posX, posY){
-  add([
+  const slime = add([
     sprite("slime",{
       anim: "runForward"
     }),
@@ -238,12 +260,26 @@ function SpawnEnemies(posX, posY){
     health(100),
     anchor("center"),
     enemyAttack(),
+    enemyHealthBar(),
     state("idle", ["idle", "attack"]),
     "enemy"
   ])
+  slime.healthBar(slime)
 }
 
-
+  function enemyHealthBar(){
+    let healthBar
+    let healthBarSize
+    return{
+      healthBar(enemy){
+        healthBar = enemy.add([rect(10, 1), pos(0, 0), color(255, 0,0)])
+      }, healthBarActualisation(enemy){
+        healthBarSize = enemy.hp() / 10
+        healthBar.width = healthBarSize;
+      }
+    }
+  }
+  
 
 // enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -261,8 +297,16 @@ const obunga = add([
 
 //scene
 
+function resetPlayerHealth(){
+  let ValueToReset = 100 - player.hp();
+  player.heal(ValueToReset);
+}
+
 export function Game(){
-    loadBackground("grass", 0, 0),
+  bHasLost = false
+  player.pos = vec2(0,0),
+  resetPlayerHealth(),
+  loadBackground("grass", 0, 0),
   loadBackground("grass", -1, 0),
   loadBackground("grass", 0, -1),
   loadBackground("grass", -1, -1),
@@ -272,10 +316,12 @@ export function Game(){
   loadBackground("grass", -2, -2),
   add(obunga),
   add(player),
+  add(playerAttackField),
   SpawnEnemies(1000, 1000),
   SpawnEnemies(500, 500),
  
   onUpdate("enemy", (enemy)=>{
+    enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
     if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
       enemy.move(dir.scale(200))
@@ -283,12 +329,17 @@ export function Game(){
      enemy.attack(enemy.pos)
     }
 
-   
-    debug.log(player.hp())
+  
    
     if(enemy.hp() <= 0){
       destroy(enemy);
     }
+
+    if(bHasLost){
+      go("gameOver")
+    }
+    
+    healthBar.width = player.hp() * 3
   })
 }                             
 
@@ -296,6 +347,12 @@ export function Game(){
 
 
 //input
+
+onKeyPress("enter", ()=> {
+ for(let i = 1; i < 500; i++){ 
+  SpawnEnemies(i* 100 , i* 100)
+}
+})
 
 onKeyDown("d", ()=> {
   resetAttack()
@@ -403,16 +460,20 @@ onKeyDown("d", ()=> {
   });
   
   let attackFieldPosition
+  let bHasLost
+
+  player.on("death", () => {
+    bHasLost = true
+    player.destroy()
+  })
+
 
   player.onUpdate(() => {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
-
-      if(player.hp() <= 0){
-        player.destroy()
-      }
-    
+      playerAttackField.pos = vec2(attackFieldPosition)
+      
   })
   
   let Obungaspeed = 20;
@@ -440,7 +501,7 @@ onKeyDown("d", ()=> {
     debug.log("uhcuwhiwfwin")
   })
 
-  debug.inspect = true
+ 
 
   
 
@@ -455,8 +516,12 @@ let isCollidingWithEnemy = false
 let attackedEnemy
 
   playerAttackField.onCollideUpdate("enemy", (enemy)=>{
+    attackedEnemy = enemy
    isCollidingWithEnemy = true
-   attackedEnemy = enemy
+  })
+
+  playerAttackField.onCollideEnd("enemy", ()=>{
+    attackedEnemy = null
   })
 
   
@@ -496,12 +561,12 @@ let attackedEnemy
   function downAttackAnimation(){
     if(comboStateDown == 1){
       player.play("downAttackOne",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     if(comboStateDown == 2){
       player.play("downAttackTwo",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
   }
@@ -509,12 +574,12 @@ let attackedEnemy
   function upAttackAnimation(){
     if(comboStateUp == 1){
       player.play("upAttackOne",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     if(comboStateUp == 2){
       player.play("upAttackTwo",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
   }
@@ -524,43 +589,45 @@ let attackedEnemy
   function HorizontalAnimation(){
     if(comboStateHorizontal == 1){
       player.play("punch",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     else if(comboStateHorizontal == 2){
      
       player.play("kick",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     else if(comboStateHorizontal == 3){
       player.play("airKickOne",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
     else if(comboStateHorizontal == 4){
       player.play("airKickTwo",{
-        onEnd: ()=> ManageAttackField()
+        onEnd: ()=> ManageAttackEffects()
       })
     }
   }
 
-  function ManageAttackField(){
-    add(playerAttackField)
-    playerAttackField.pos = vec2(attackFieldPosition)
-
+  function ManageAttackEffects(){
+    
+    let knockBackForce = 6;
     if(isCollidingWithEnemy){
       let Dmg = 15;
     if(player.state === "leftRight")
     {
       if(comboStateHorizontal == 1){
         Dmg = 5;
+        knockBackForce = 1
       }
       else if(comboStateHorizontal == 2){
         Dmg = 7;
+        knockBackForce = 1
       }
       else if(comboStateHorizontal == 3){
         Dmg = 10;
+        knockBackForce = 4
       }
     }
 
@@ -577,15 +644,40 @@ let attackedEnemy
     }
 
 
-      attackedEnemy.hurt(Dmg)
+      
 
+      let knockbackX
+      let knockbackY
 
+      if(attackFieldConditionX == 0){
+        knockbackX = 0
+      }else if(attackFieldConditionX < 0)
+      {
+        knockbackX = -100
+      }else{
+        knockbackX = 100
+      }
 
+      if(attackFieldConditionY == 0){
+        knockbackY = 0
+      }else if(attackFieldConditionY < 0)
+      {
+        knockbackY = -100
+      }else{
+        knockbackY = 100
+      }
 
+      knockbackX *= knockBackForce
+
+      let knockBack = vec2(knockbackX, knockbackY)
+      
+      if(attackedEnemy != null){
+        attackedEnemy.hurt(Dmg)
+        attackedEnemy.moveBy(knockBack)  
+      }
+     
     }
-    wait(0.01, ()=>{
-      playerAttackField.destroy()
-    })
+   
    
   }
 
