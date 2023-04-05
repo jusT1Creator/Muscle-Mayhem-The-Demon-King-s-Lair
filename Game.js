@@ -1,5 +1,8 @@
 import k from "./kabam.js"
+import { GameOver } from "./GameOver.js";
 
+
+scene("gameOver", GameOver)
 
 let attackFieldPositionsX = [70, -70, 0];
 let attackFieldPositionsY = [-100, 100, 0];
@@ -405,13 +408,14 @@ onKeyDown("d", ()=> {
   });
   
   let attackFieldPosition
-
+  let bHasLost
   player.onUpdate(() => {
     attackFieldPosition = vec2(player.worldPos().x + attackFieldConditionX, player.worldPos().y + attackFieldConditionY)
       // Set the viewport center to player.pos
       camPos(player.worldPos())
       playerAttackField.pos = vec2(attackFieldPosition)
       if(player.hp() <= 0){
+        go("gameOver")
         player.destroy()
       }
     
