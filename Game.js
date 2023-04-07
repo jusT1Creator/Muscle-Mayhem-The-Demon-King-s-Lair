@@ -151,7 +151,46 @@ loadSprite("slime", "assets/Slime_Jump_Forward_Sprite.png",{
 }
 })
 
+loadSprite("villain", "assets/villain_spriteSheet.png",{
+  sliceX: 8,
+  sliceY: 3,
+  anims:{
+    idle:{
+      from: 8,
+      to: 8,
+      loop: false,
+      speed: 1
+    },
+    move:{
+      from: 0,
+      to: 7,
+      loop: true,
+      speed: 8
+    }, 
+    attack:{
+      from: 8,
+      to: 16,
+      loop: false,
+      speed: 8
+    }
+  }
+})
+
+loadSprite("slam_effect", "assets/slam_effect_spritesheet.png",{
+  sliceX: 5,
+  sliceY: 1,
+  anims:{
+    idle:{
+      from: 0,
+      to: 4,
+      loop:false,
+      speed: 12
+    }
+  }
+})
 //components
+
+
 
 function enemyAttack(){
   let bCanAttack = true;
@@ -184,6 +223,43 @@ function enemyAttack(){
   }
 }
 
+function villainAttack(){
+  let bCanAttack = true;
+  return{
+    attack(position, damage)
+    {
+      if(bCanAttack)
+      { 
+      const enemyAttackField = add([
+      pos(position),
+      area(),
+      scale(vec2(8, 8)),
+      sprite("slam_effect", {
+        anim:"idle"
+      }),
+      anchor("center"),
+     "enemyAttackField"
+    ])
+    bCanAttack = false;
+    enemyAttackField.onCollide("player", ()=>{
+      player.hurt(damage);
+      player.moveBy(10, 10)
+      })
+  
+    enemyAttackField.onAnimEnd((anim) => {
+      if (anim === "idle") {
+            enemyAttackField.destroy();
+      }
+    })
+    wait(2, ()=>{
+      bCanAttack = true
+    })
+      }
+    }
+  }
+}
+
+
 
 
 //music;
@@ -215,6 +291,23 @@ const player =  add([
      dead: false,
       speed: 700
  }
+])
+
+const villain = add([
+  z(5),
+  sprite("villain"),
+  pos(0, 500),
+  health(1000),
+  area(),
+  anchor("center"),
+  state("idle", ["idle","moving", "attack"]),
+  villainAttack(),
+  "enemy",
+  "villain",
+  {
+    dead: false,
+    speed: 100,
+  }
 ])
 
 const healthBarVisualisationAssistant = player.add([
@@ -262,7 +355,8 @@ function SpawnEnemies(posX, posY){
     enemyAttack(),
     enemyHealthBar(),
     state("idle", ["idle", "attack"]),
-    "enemy"
+    "enemy",
+    "slime"
   ])
   slime.healthBar(slime)
 }
@@ -314,13 +408,15 @@ export function Game(){
   loadBackground("grass", -2, 0),
   loadBackground("grass", 0, -2),
   loadBackground("grass", -2, -2),
-  add(obunga),
+  //add(obunga),
   add(player),
+  add(villain),
   add(playerAttackField),
   SpawnEnemies(1000, 1000),
   SpawnEnemies(500, 500),
- 
-  onUpdate("enemy", (enemy)=>{
+  player.hurt(),
+  player.heal(),
+  onUpdate("slime", (enemy)=>{
     enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
     if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
@@ -335,14 +431,66 @@ export function Game(){
       destroy(enemy);
     }
 
+  }),
+  onUpdate(()=>{
     if(bHasLost){
       go("gameOver")
     }
-    
-    healthBar.width = player.hp() * 3
   })
 }                             
 
+let villainLookState = 2
+let villainLookDirection = 2
+
+villain.onStateUpdate("moving", ()=>{
+  if(villain.curAnim() != "move" && villain.curAnim() != "move") 
+    {
+      villain.play("move");
+    }
+  const dir = player.pos.sub(villain.pos).unit()
+  if(player.pos.x - villain.pos.x  > 120 || player.pos.x - villain.pos.x < -120 || player.pos.y - villain.pos.y  > 150 || player.pos.y - villain.pos.y < -150){
+    villain.move(dir.scale(villain.speed))
+  } else{
+    villain.enterState("attack")
+  }
+
+  if(player.pos.x - villain.pos.x > 0){
+    villainLookDirection = 1
+  } else{
+    villainLookDirection = 2
+  }
+
+  if(villainLookState != villainLookDirection){
+    if(villainLookState == 1){
+      villainLookState = 2
+      villain.flipX = false
+    }else if(villainLookState == 2){
+      villainLookState = 1
+      villain.flipX = true
+    }
+  }
+
+  
+
+})
+
+villain.onStateEnter("attack", ()=>{
+  villain.play("attack", {
+    onEnd: ()=> {
+      villain.attack(villain.pos, 50)
+      wait(2, ()=> villain.enterState("moving"))
+    }
+  })
+})
+
+villain.onStateEnter("idle", ()=>{
+  villain.play("idle")
+  wait(2, ()=> villain.enterState("moving"))
+})
+
+villain.on("death", () => {
+  villain.destroy()
+})
 
 
 
@@ -473,7 +621,7 @@ onKeyDown("d", ()=> {
       // Set the viewport center to player.pos
       camPos(player.worldPos())
       playerAttackField.pos = vec2(attackFieldPosition)
-      
+      healthBar.width = player.hp() * 3
   })
   
   let Obungaspeed = 20;
