@@ -138,15 +138,27 @@ loadSprite("Vertical_Attacks", "assets/Vertical_attacks.png", {
   }
 })
 
-loadSprite("slime", "assets/Slime_Jump_Forward_Sprite.png",{
-  sliceX: 12,
-  sliceY: 1,
+loadSprite("slime", "assets/Slime_sprite_sheet.png",{
+  sliceX: 9,
+  sliceY: 4,
   anims:{
     runForward:{
     from: 0,
-    to: 11,
+    to: 12,
     loop: true,
     speed: 12
+  },
+  attack:{
+    from:13,
+    to:26,
+    loop:false,
+    speed: 15
+  },
+  death:{
+    from: 27,
+    to: 35,
+    loop: false,
+    speed: 15
   }
 }
 })
@@ -194,6 +206,7 @@ loadSprite("slam_effect", "assets/slam_effect_spritesheet.png",{
 
 function enemyAttack(){
   let bCanAttack = true;
+  let bInAttack = false;
   return{
     attack(position)
     {
@@ -219,6 +232,18 @@ function enemyAttack(){
       bCanAttack = true
     })
       }
+    },
+    getCanAttack(){
+      return bCanAttack;
+    },
+    setCanAttack(value){
+      bCanAttack = value
+    },
+    getInAttack(){
+      return bInAttack;
+    },
+    setInAttack(value){
+      bInAttack = value
     }
   }
 }
@@ -356,7 +381,10 @@ function SpawnEnemies(posX, posY){
     enemyHealthBar(),
     state("idle", ["idle", "attack"]),
     "enemy",
-    "slime"
+    "slime",
+    {
+      bIsDead: false
+    }
   ])
   slime.healthBar(slime)
 }
@@ -419,16 +447,35 @@ export function Game(){
   onUpdate("slime", (enemy)=>{
     enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
-    if(player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150){
+    if((player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150) && enemy.getInAttack() == false && enemy.bIsDead == false){
       enemy.move(dir.scale(200))
-    } else{
-     enemy.attack(enemy.pos)
+      if(enemy.curAnim() != "runForward") 
+    {
+      enemy.play("runForward")
     }
+    } else{
+      if(enemy.curAnim() != "attack" && enemy.getCanAttack() == true) 
+    {
+      enemy.setInAttack(true)
+      enemy.play("attack", {
+        onEnd: ()=> {
+          enemy.attack(enemy.pos)
+          enemy.setInAttack(false)
+        }
+      })
+    }
+  }
 
   
    
     if(enemy.hp() <= 0){
-      destroy(enemy);
+      enemy.setCanAttack(false)
+      enemy.bIsDead = true
+      if(enemy.curAnim() != "death"){
+        enemy.play("death", {
+          onEnd: ()=>  destroy(enemy)
+        })
+      }
     }
 
   }),
@@ -443,7 +490,7 @@ let villainLookState = 2
 let villainLookDirection = 2
 
 villain.onStateUpdate("moving", ()=>{
-  if(villain.curAnim() != "move" && villain.curAnim() != "move") 
+  if(villain.curAnim() != "move") 
     {
       villain.play("move");
     }
