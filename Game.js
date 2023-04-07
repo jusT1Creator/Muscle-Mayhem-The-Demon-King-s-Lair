@@ -176,6 +176,18 @@ loadSprite("villain", "assets/villain_spriteSheet.png",{
   }
 })
 
+loadSprite("slam_effect", "assets/slam_effect_spritesheet.png",{
+  sliceX: 5,
+  sliceY: 1,
+  anims:{
+    idle:{
+      from: 0,
+      to: 4,
+      loop:false,
+      speed: 12
+    }
+  }
+})
 //components
 
 
@@ -220,20 +232,25 @@ function villainAttack(){
       { 
       const enemyAttackField = add([
       pos(position),
-      area({scale: vec2(8, 4)}),
-      sprite("attackField"),
+      area(),
+      scale(vec2(8, 8)),
+      sprite("slam_effect", {
+        anim:"idle"
+      }),
       anchor("center"),
      "enemyAttackField"
-        ])
+    ])
     bCanAttack = false;
     enemyAttackField.onCollide("player", ()=>{
       player.hurt(damage);
-      player.moveBy(300, 0)
-        })
+      player.moveBy(10, 10)
+      })
   
-    wait(0.1, ()=>{
-      enemyAttackField.destroy()
-        })
+    enemyAttackField.onAnimEnd((anim) => {
+      if (anim === "idle") {
+            enemyAttackField.destroy();
+      }
+    })
     wait(2, ()=>{
       bCanAttack = true
     })
@@ -391,13 +408,14 @@ export function Game(){
   loadBackground("grass", -2, 0),
   loadBackground("grass", 0, -2),
   loadBackground("grass", -2, -2),
-  add(obunga),
+  //add(obunga),
   add(player),
   add(villain),
   add(playerAttackField),
   SpawnEnemies(1000, 1000),
   SpawnEnemies(500, 500),
- 
+  player.hurt(),
+  player.heal(),
   onUpdate("slime", (enemy)=>{
     enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
@@ -413,11 +431,11 @@ export function Game(){
       destroy(enemy);
     }
 
+  }),
+  onUpdate(()=>{
     if(bHasLost){
       go("gameOver")
     }
-    
-    healthBar.width = player.hp() * 3
   })
 }                             
 
@@ -458,9 +476,11 @@ villain.onStateUpdate("moving", ()=>{
 
 villain.onStateEnter("attack", ()=>{
   villain.play("attack", {
-    onEnd: ()=> villain.attack(villain.pos, 50)
+    onEnd: ()=> {
+      villain.attack(villain.pos, 50)
+      wait(2, ()=> villain.enterState("moving"))
+    }
   })
-  wait(2, ()=> villain.enterState("moving"))
 })
 
 villain.onStateEnter("idle", ()=>{
@@ -601,7 +621,7 @@ onKeyDown("d", ()=> {
       // Set the viewport center to player.pos
       camPos(player.worldPos())
       playerAttackField.pos = vec2(attackFieldPosition)
-      
+      healthBar.width = player.hp() * 3
   })
   
   let Obungaspeed = 20;
