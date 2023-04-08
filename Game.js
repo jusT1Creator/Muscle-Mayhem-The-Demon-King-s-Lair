@@ -49,7 +49,7 @@ loadSprite("attackField", "assets/Player_Attack_Field.png")
 
 loadSprite("ball", "assets/Ball.png")
 
-loadSprite("projectile_fast", "assets/fast_projectile")
+loadSprite("projectile_fast", "assets/fast_projectile.png")
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
@@ -252,6 +252,7 @@ function enemyAttack(){
 
 function villainAttack(){
   let bCanAttack = true;
+  let bCanShootProjectile = true;
   return{
     attack(position, damage)
     {
@@ -282,6 +283,46 @@ function villainAttack(){
       bCanAttack = true
     })
       }
+    },
+
+
+    projectileAttack(playerPosition){
+      
+      if(bCanShootProjectile)
+     { 
+      
+      const projectile = add([
+        pos(villain.pos),
+        area(),
+        sprite("projectile_fast"),
+        anchor("center"),
+        {
+          speed: 2000
+        }
+      ])
+
+      projectile.onCollide("player", ()=>{
+        player.hurt(20);
+        player.moveBy(10, 10)
+        projectile.destroy()
+        })
+
+      bCanShootProjectile = false;
+      projectile.onUpdate(()=>{
+          const dir = playerPosition.sub(projectile.pos).unit()
+          projectile.move(dir.scale(projectile.speed))
+          
+          if(projectile.pos.x - playerPosition.x < 15 && projectile.pos.x - playerPosition.x  > -15 ){
+            projectile.speed = 0
+            projectile.destroy()
+          }
+      })
+    
+      wait(0.1, ()=>{
+        bCanShootProjectile = true;
+      })
+    
+     }
     }
   }
 }
@@ -334,6 +375,8 @@ const villain = add([
   {
     dead: false,
     speed: 100,
+    bInCloseRangeAttack: false,
+    bAttackStateCalled: false,
   }
 ])
 
@@ -442,8 +485,8 @@ export function Game(){
   add(player),
   add(villain),
   add(playerAttackField),
-  SpawnEnemies(1000, 1000),
-  SpawnEnemies(500, 500),
+  //SpawnEnemies(1000, 1000),
+  //SpawnEnemies(500, 500),
   player.hurt(),
   player.heal(),
   onUpdate("slime", (enemy)=>{
@@ -497,10 +540,15 @@ villain.onStateUpdate("moving", ()=>{
       villain.play("move");
     }
   const dir = player.pos.sub(villain.pos).unit()
-  if(player.pos.x - villain.pos.x  > 120 || player.pos.x - villain.pos.x < -120 || player.pos.y - villain.pos.y  > 150 || player.pos.y - villain.pos.y < -150){
+  if(player.pos.x - villain.pos.x  > 220 || player.pos.x - villain.pos.x < -220 || player.pos.y - villain.pos.y  > 220 || player.pos.y - villain.pos.y < -220){
     villain.move(dir.scale(villain.speed))
-  } else{
-    villain.enterState("attack")
+    villain.bInCloseRangeAttack = false;
+  }else{
+    villain.bInCloseRangeAttack = true;
+    if(villain.curAnim() != "idle") 
+    {
+      villain.play("idle");
+    }
   }
 
   if(player.pos.x - villain.pos.x > 0){
@@ -518,18 +566,49 @@ villain.onStateUpdate("moving", ()=>{
       villain.flipX = true
     }
   }
+  if(villain.bAttackStateCalled == false){
+    villain.bAttackStateCalled = true;
+    wait(2, ()=> {villain.enterState("attack")
+    debug.log("neuivg")
+    })
+  }
 
   
 
 })
 
-villain.onStateEnter("attack", ()=>{
-  villain.play("attack", {
-    onEnd: ()=> {
-      villain.attack(villain.pos, 50)
-      wait(2, ()=> villain.enterState("moving"))
+villain.onStateEnter("attack", async ()=>{
+
+  if(!villain.bInCloseRangeAttack){
+    villain.play("idle")
+    
+    for(let i = 0; i < 2; i++){
+      await wait(0.2)
+      villain.projectileAttack(player.pos)
     }
+    
+        
+    
+    wait(2, ()=> {villain.enterState("moving")
+    villain.bAttackStateCalled = false;
   })
+  }
+  if(villain.bInCloseRangeAttack)
+  {if(villain.curAnim() != "attack") 
+  {
+    villain.play("attack", {
+      onEnd: ()=> {
+        villain.attack(villain.pos, 50)
+        wait(2, ()=> {villain.enterState("moving")
+        villain.bAttackStateCalled = false;
+      })
+      }
+    })
+  }
+    
+  }
+
+  
 })
 
 villain.onStateEnter("idle", ()=>{
