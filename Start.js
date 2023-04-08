@@ -1,7 +1,9 @@
 import k from "./kabam.js"
 import { Game } from "./Game.js";
 import music from "./Game.js";
+import { Credits } from "./Credits.js";
 
+scene("credits", Credits)
 scene("game", Game)
 
 loadSound("StartMusic", "assets/Aot relaxing music.m4a")
@@ -24,7 +26,6 @@ export function Start(){
     onUpdate(() => setCursor("default")),
 	onUpdate(()=>{
 		if (Startmusic.paused) {
-			debug.log("huedgsvuzfv")
 			Startmusic.play()
 		}
 		music.paused = true;
@@ -77,6 +78,19 @@ addButton("Start", vec2(200, 100), () => {
 	music.paused = false;
 	Startmusic.paused = true;
 })
-addButton("Quit", vec2(200, 200), () => debug.log("bye"))
+addButton("Credits", vec2(200, 200), () => {
+	go("credits")
+	music.paused = false;
+	Startmusic.paused = true;
+})
 
+
+
+const txt = add([
+	text("I welcome you to our game,\nyour objective is to find the way\nto the secret layer of the villain and beat him.\nHowever this is no easy task,\nthe way is guarded by a hoard of slimes\naiming to beat you up!\nAre you ready for the challenge?", 
+	{ size: 32, width: width() - 230, align: "left" }),
+	pos(800, 700),
+	anchor("center"),
+	color(0, 0, 0),
+])
 }
