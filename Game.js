@@ -283,7 +283,10 @@ function villainAttack(){
       bCanAttack = true
     })
       }
-    },
+    },setCanAttack(value){
+      bCanAttack = value
+    }
+    ,
 
 
     projectileAttack(playerPosition){
@@ -472,6 +475,9 @@ function resetPlayerHealth(){
 export function Game(){
   bHasLost = false
   player.pos = vec2(0,0),
+  villain.enterState("idle"),
+  villain.bAttackStateCalled = false,
+  villain.setCanAttack(true),
   resetPlayerHealth(),
   loadBackground("grass", 0, 0),
   loadBackground("grass", -1, 0),
@@ -750,6 +756,7 @@ onKeyDown("d", ()=> {
       camPos(player.worldPos())
       playerAttackField.pos = vec2(attackFieldPosition)
       healthBar.width = player.hp() * 3
+      
   })
   
   let Obungaspeed = 20;
