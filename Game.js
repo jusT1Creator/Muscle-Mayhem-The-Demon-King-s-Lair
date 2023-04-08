@@ -49,6 +49,8 @@ loadSprite("attackField", "assets/Player_Attack_Field.png")
 
 loadSprite("ball", "assets/Ball.png")
 
+loadSprite("projectile_fast", "assets/fast_projectile")
+
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
   sliceY:9,
