@@ -291,6 +291,7 @@ function villainAttack(){
       }
     },setCanAttack(value){
       bCanAttack = value
+      bCanShootProjectile = value
     }
     ,
 
@@ -329,6 +330,7 @@ function villainAttack(){
     
       wait(0.1, ()=>{
         bCanShootProjectile = true;
+
       })
     
      }
@@ -495,12 +497,10 @@ export function Game(){
   loadBackground("grass", -2, -2),
   //add(obunga),
   add(player),
-  add(villain),
+  //add(villain),
   add(playerAttackField),
-  //SpawnEnemies(1000, 1000),
-  //SpawnEnemies(500, 500),
-  player.hurt(),
-  player.heal(),
+  SpawnEnemies(1000, 1000),
+  SpawnEnemies(500, 500),
   onUpdate("slime", (enemy)=>{
     enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
@@ -538,10 +538,28 @@ export function Game(){
   }),
   onUpdate(()=>{
     if(bHasLost){
+      //go("gameOver")
+      go("dungeon")
+    }
+  })
+}
+
+scene("dungeon", ()=>{
+  bHasLost = false,
+  player.pos = vec2(0,0),
+  villain.enterState("idle"),
+  villain.bAttackStateCalled = false,
+  villain.setCanAttack(true),
+  resetPlayerHealth(),
+  add(player),
+  add(villain),
+  add(playerAttackField),
+  onUpdate(()=>{
+    if(bHasLost){
       go("gameOver")
     }
   })
-}                             
+})
 
 let villainLookState = 2
 let villainLookDirection = 2
