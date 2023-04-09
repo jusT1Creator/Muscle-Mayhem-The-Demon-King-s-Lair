@@ -167,7 +167,7 @@ loadSprite("slime", "assets/Slime_sprite_sheet.png",{
 
 loadSprite("villain", "assets/villain_spriteSheet.png",{
   sliceX: 8,
-  sliceY: 3,
+  sliceY: 4,
   anims:{
     idle:{
       from: 8,
@@ -186,6 +186,12 @@ loadSprite("villain", "assets/villain_spriteSheet.png",{
       to: 16,
       loop: false,
       speed: 8
+    },
+    projectile:{
+      from: 17,
+      to: 27,
+      loop: false,
+      speed: 8,
     }
   }
 })
@@ -295,7 +301,7 @@ function villainAttack(){
      { 
       
       const projectile = add([
-        pos(villain.pos),
+        pos(villain.pos.x, villain.pos.y -50),
         area(),
         sprite("projectile_fast"),
         anchor("center"),
@@ -574,30 +580,32 @@ villain.onStateUpdate("moving", ()=>{
   }
   if(villain.bAttackStateCalled == false){
     villain.bAttackStateCalled = true;
-    wait(2, ()=> {villain.enterState("attack")
-    debug.log("neuivg")
-    })
+    wait(2, ()=> {villain.enterState("attack")})
   }
 
   
 
 })
 
-villain.onStateEnter("attack", async ()=>{
+villain.onStateEnter("attack", ()=>{
 
   if(!villain.bInCloseRangeAttack){
-    villain.play("idle")
-    
-    for(let i = 0; i < 2; i++){
-      await wait(0.2)
-      villain.projectileAttack(player.pos)
+    if(villain.curAnim() != "projectile"){
+      villain.play("projectile", {
+        onEnd: async ()=> {
+          for(let i = 0; i < 2; i++){
+            await wait(0.2)
+            villain.projectileAttack(player.pos)
+          }
+          
+              
+          
+          wait(2, ()=> {villain.enterState("moving")
+          villain.bAttackStateCalled = false;
+          })
+        }
+      })
     }
-    
-        
-    
-    wait(2, ()=> {villain.enterState("moving")
-    villain.bAttackStateCalled = false;
-  })
   }
   if(villain.bInCloseRangeAttack)
   {if(villain.curAnim() != "attack") 
