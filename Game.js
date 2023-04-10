@@ -12,25 +12,6 @@ let attackFieldConditionY = attackFieldPositionsY[2];
 //debug.inspect = true
 
 
-function loadBackground(backgroundName, posX, posY){
-
-
-    const grassbackground = add([
-        sprite(backgroundName),
-        scale(width()/450, height()/450),
-        pos(0, 0)
-    ]);
-
-    let spawnPositionX = posX * grassbackground.scale.x;
-    let spawnPositionY = posY * grassbackground.scale.y;
-
-    grassbackground.pos.x = spawnPositionX * 2000
-    grassbackground.pos.y = spawnPositionY * 2000
- }
-
- 
-
-
 document.body.style.overflow = 'hidden';
 
 //sprites:
@@ -546,6 +527,7 @@ export function Game(){
   villain.bAttackStateCalled = false,
   villain.setCanAttack(true),
   resetPlayerHealth(),
+<<<<<<< HEAD
   loadBackground("grass", 0, 0),
   loadBackground("grass", -1, 0),
   loadBackground("grass", 0, -1),
@@ -554,6 +536,31 @@ export function Game(){
   loadBackground("grass", -2, 0),
   loadBackground("grass", 0, -2),
   loadBackground("grass", -2, -2), 
+=======
+  addLevel([
+    "||||||",
+    "|^^^^|",
+    "|^^^^|",
+    "|^^^^|",
+    "|^^^^|",
+    "||||||",
+  ], {
+    tileWidth: 2048,
+    tileHeight: 2048,
+    tiles: {
+        "^": () => [
+            sprite("grass"),
+            anchor("center"),
+            "background",
+        ],
+        "|": () => [
+          sprite("play"),
+          anchor("center"),
+          "background",
+        ],
+    },
+  }),
+>>>>>>> ffs
   //add(obunga),
   add(player),
   //add(villain),
