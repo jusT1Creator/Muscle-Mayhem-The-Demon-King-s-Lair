@@ -5,7 +5,7 @@ import { GameOver } from "./GameOver.js";
 scene("gameOver", GameOver)
 
 let attackFieldPositionsX = [70, -70, 0];
-let attackFieldPositionsY = [-100, 100, 0];
+let attackFieldPositionsY = [-75, 75, 0];
 let attackFieldConditionX = attackFieldPositionsX[0];
 let attackFieldConditionY = attackFieldPositionsY[2];
 
@@ -47,11 +47,26 @@ loadSound("overtaken", "assets/Overtaken.m4a")
 
 loadSound("villain_theme", "assets/villain_theme.mp3")
 
+loadSound("game_Music", "assets/game_music.mp3")
+
 loadSprite("attackField", "assets/Player_Attack_Field.png")
 
 loadSprite("ball", "assets/Ball.png")
 
 loadSprite("projectile_fast", "assets/fast_projectile.png")
+
+loadSprite("projectile_explosion", "assets/projectile_explosion_spritesheet.png", {
+  sliceX: 4,
+  sliceY: 1,
+  anims:{
+    explosion:{
+      from: 0,
+      to: 3,
+      loop: false,
+      speed: 12
+    }
+  }
+})
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
@@ -224,7 +239,7 @@ function enemyAttack(){
       { 
       const enemyAttackField = add([
       pos(position),
-      area({scale: vec2(8, 4)}),
+      area({scale: vec2(6, 3)}),
       sprite("attackField"),
       anchor("center"),
      "enemyAttackField"
@@ -309,6 +324,7 @@ function villainAttack(){
         area(),
         sprite("projectile_fast"),
         anchor("center"),
+        projectieDestructionManager(),
         {
           speed: 2000
         }
@@ -317,7 +333,7 @@ function villainAttack(){
       projectile.onCollide("player", ()=>{
         player.hurt(20);
         shake(4)
-        projectile.destroy()
+        projectile.explosion(projectile)
         })
 
       bCanShootProjectile = false;
@@ -327,7 +343,7 @@ function villainAttack(){
           
           if(projectile.pos.x - playerPosition.x < 15 && projectile.pos.x - playerPosition.x  > -15 ){
             projectile.speed = 0
-            projectile.destroy()
+            projectile.explosion(projectile)
           }
       })
     
@@ -341,11 +357,28 @@ function villainAttack(){
   }
 }
 
+function projectieDestructionManager(){
+  return{
+    explosion(projectile){
+      
+      const projectileExplosion = add([
+        sprite("projectile_explosion"),
+        pos(projectile.pos)
+      ])
 
+      projectileExplosion.play("explosion",{
+        onEnd: ()=> projectileExplosion.destroy()
+      })
+
+      projectile.destroy();
+    }
+  }
+}
+  
 
 
 //music;
-const music = play("overtaken", {
+const music = play("game_Music", {
   volume: 0.5,
   loop: true,
   paused: true
@@ -454,7 +487,6 @@ function SpawnEnemies(posX, posY){
     }),
     area({ 
       scale: vec2(0.5, 0.5),
-      offset: vec2(-10, 35)
     }),
     scale(vec2(5, 5)),
     pos(posX, posY),
@@ -589,6 +621,7 @@ scene("dungeon", ()=>{
     villainHealthBar.width = villain.hp()
     if(bHasLost){
       go("gameOver")
+      villainTheme.paused = true;
     }
   })
 })
@@ -647,7 +680,7 @@ villain.onStateEnter("attack", ()=>{
     if(villain.curAnim() != "projectile"){
       villain.play("projectile", {
         onEnd: async ()=> {
-          for(let i = 0; i < 2; i++){
+          for(let i = 0; i < 5; i++){
             await wait(0.2)
             villain.projectileAttack(player.pos)
           }
@@ -693,7 +726,7 @@ villain.on("death", () => {
 //input
 
 onKeyPress("enter", ()=> {
- for(let i = 1; i < 500; i++){ 
+ for(let i = 1; i < 50; i++){ 
   SpawnEnemies(i* 100 , i* 100)
 }
 })
@@ -820,7 +853,7 @@ onKeyDown("d", ()=> {
       
   })
   
-  let Obungaspeed = 20;
+  /*let Obungaspeed = 20;
 
   obunga.onUpdate( () =>{
    
@@ -829,7 +862,7 @@ onKeyDown("d", ()=> {
     }
     const dir = player.pos.sub(obunga.pos).unit()
     obunga.move(dir.scale(Obungaspeed))
-  }) 
+  }) */
   
   function resetAttack(){
     comboStateHorizontal = 0;
@@ -973,7 +1006,7 @@ let attackedEnemy
       }
       else if(comboStateHorizontal == 3){
         Dmg = 10;
-        knockBackForce = 4
+        knockBackForce = 2
       }
     }
 
@@ -999,18 +1032,18 @@ let attackedEnemy
         knockbackX = 0
       }else if(attackFieldConditionX < 0)
       {
-        knockbackX = -100
+        knockbackX = -75
       }else{
-        knockbackX = 100
+        knockbackX = 75
       }
 
       if(attackFieldConditionY == 0){
         knockbackY = 0
       }else if(attackFieldConditionY < 0)
       {
-        knockbackY = -100
+        knockbackY = -75
       }else{
-        knockbackY = 100
+        knockbackY = 75
       }
 
       knockbackX *= knockBackForce
