@@ -603,10 +603,14 @@ villain.onStateUpdate("moving", ()=>{
     }
   const dir = player.pos.sub(villain.pos).unit()
   if(player.pos.x - villain.pos.x  > 220 || player.pos.x - villain.pos.x < -220 || player.pos.y - villain.pos.y  > 220 || player.pos.y - villain.pos.y < -220){
-    villain.move(dir.scale(villain.speed))
     villain.bInCloseRangeAttack = false;
   }else{
     villain.bInCloseRangeAttack = true;
+  }
+
+  if(player.pos.x - villain.pos.x  > 50 || player.pos.x - villain.pos.x < -50 || player.pos.y - villain.pos.y  > 50 || player.pos.y - villain.pos.y < -50){
+    villain.move(dir.scale(villain.speed))
+  }else{
     if(villain.curAnim() != "idle") 
     {
       villain.play("idle");
