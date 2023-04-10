@@ -528,31 +528,28 @@ export function Game(){
   villain.setCanAttack(true),
   resetPlayerHealth(),
   addLevel([
-    "^^^^",
-    "^^^^",
-    "^^^^",
-    "^^^^",
+    "||||||",
+    "|^^^^|",
+    "|^^^^|",
+    "|^^^^|",
+    "|^^^^|",
+    "||||||",
   ], {
-    // define the size of tile block
     tileWidth: 2048,
     tileHeight: 2048,
-    // define what each symbol means, by a function returning a component list (what will be passed to add())
     tiles: {
         "^": () => [
             sprite("grass"),
             anchor("center"),
             "background",
         ],
+        "|": () => [
+          sprite("play"),
+          anchor("center"),
+          "background",
+        ],
     },
   }),
-  /* loadBackground("grass", 0, 0),
-  loadBackground("grass", -1, 0),
-  loadBackground("grass", 0, -1),
-  loadBackground("grass", -1, -1),
-  loadBackground("grass", 2, 0),
-  loadBackground("grass", -2, 0),
-  loadBackground("grass", 0, -2),
-  loadBackground("grass", -2, -2), */
   //add(obunga),
   add(player),
   //add(villain),
