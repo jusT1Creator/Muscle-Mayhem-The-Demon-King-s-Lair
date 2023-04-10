@@ -231,8 +231,8 @@ function enemyAttack(){
         ])
     bCanAttack = false;
     enemyAttackField.onCollide("player", ()=>{
-      player.hurt(100);
-      player.moveBy(10, 10)
+      player.hurt(10);
+      shake(4)
         })
   
     wait(0.1, ()=>{
@@ -265,7 +265,8 @@ function villainAttack(){
     attack(position, damage)
     {
       if(bCanAttack)
-      { 
+      {
+      shake(6) 
       const enemyAttackField = add([
       pos(position),
       area(),
@@ -279,7 +280,7 @@ function villainAttack(){
     bCanAttack = false;
     enemyAttackField.onCollide("player", ()=>{
       player.hurt(damage);
-      player.moveBy(10, 10)
+      shake(100)
       })
   
     enemyAttackField.onAnimEnd((anim) => {
@@ -315,7 +316,7 @@ function villainAttack(){
 
       projectile.onCollide("player", ()=>{
         player.hurt(20);
-        player.moveBy(10, 10)
+        shake(4)
         projectile.destroy()
         })
 
