@@ -18,6 +18,8 @@ document.body.style.overflow = 'hidden';
 
 //sprites:
 
+loadSprite("toitoi", "assets/toi toi for game.png")
+
 loadSprite("grass", "assets/Grass_Background.png");
 
 loadSprite("obunga", "assets/OIP.png");
@@ -558,6 +560,21 @@ export function Game(){
           body({ isStatic: true }),
           "wall",
         ],
+    },
+  }),
+  addLevel([
+    "t",
+  ], {
+    tileWidth: 400,
+    tileHeight: 400,
+    pos: vec2(2000, 2000),
+    tiles: {
+      "t": () => [
+        sprite("toitoi"),
+        anchor("center"),
+        area(),
+        "portal",
+      ],
     },
   }),
   //add(obunga),
