@@ -527,16 +527,6 @@ export function Game(){
   villain.bAttackStateCalled = false,
   villain.setCanAttack(true),
   resetPlayerHealth(),
-<<<<<<< HEAD
-  loadBackground("grass", 0, 0),
-  loadBackground("grass", -1, 0),
-  loadBackground("grass", 0, -1),
-  loadBackground("grass", -1, -1),
-  loadBackground("grass", 2, 0),
-  loadBackground("grass", -2, 0),
-  loadBackground("grass", 0, -2),
-  loadBackground("grass", -2, -2), 
-=======
   addLevel([
     "||||||",
     "|^^^^|",
@@ -560,7 +550,6 @@ export function Game(){
         ],
     },
   }),
->>>>>>> ffs
   //add(obunga),
   add(player),
   //add(villain),
