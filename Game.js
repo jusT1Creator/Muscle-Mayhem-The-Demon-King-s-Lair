@@ -9,6 +9,8 @@ let attackFieldPositionsY = [-75, 75, 0];
 let attackFieldConditionX = attackFieldPositionsX[0];
 let attackFieldConditionY = attackFieldPositionsY[2];
 
+setGravity(0)
+
 //debug.inspect = true
 
 
@@ -379,6 +381,7 @@ const player =  add([
     frame: 0,
   }),
   pos(),
+  body(),
   health(100),
   area({ 
     scale: vec2(0.5, 1)
@@ -528,32 +531,29 @@ export function Game(){
   villain.setCanAttack(true),
   resetPlayerHealth(),
   addLevel([
-
-    "^^^^",
-    "^^^^",
-    "^^^^",
-    "^^^^",
-
-    /*"||||||",
+    "||||||",
     "|^^^^|",
     "|^^^^|",
     "|^^^^|",
     "|^^^^|",
-    "||||||",*/
+    "||||||",
   ], {
     tileWidth: 2048,
     tileHeight: 2048,
+    pos: vec2(-2000, -2000),
     tiles: {
         "^": () => [
-            sprite("grass"),
-            anchor("center"),
-            "background",
-        ],
-        /*"|": () => [
-          sprite("attackField"),
+          sprite("grass"),
           anchor("center"),
           "background",
-        ],*/
+        ],
+        "|": () => [
+          sprite("grass"),
+          anchor("center"),
+          area(),
+          body({ isStatic: true }),
+          "wall",
+        ],
     },
   }),
   //add(obunga),
