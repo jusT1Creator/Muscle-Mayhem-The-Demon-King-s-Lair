@@ -266,7 +266,7 @@ function villainAttack(){
       const enemyAttackField = add([
       pos(position),
       area(),
-      scale(vec2(8, 8)),
+      scale(vec2(9, 9)),
       sprite("slam_effect", {
         anim:"idle"
       }),
@@ -637,7 +637,7 @@ villain.onStateUpdate("moving", ()=>{
       villain.play("move");
     }
   const dir = player.pos.sub(villain.pos).unit()
-  if(player.pos.x - villain.pos.x  > 220 || player.pos.x - villain.pos.x < -220 || player.pos.y - villain.pos.y  > 220 || player.pos.y - villain.pos.y < -220){
+  if(player.pos.x - villain.pos.x  > 240 || player.pos.x - villain.pos.x < -240 || player.pos.y - villain.pos.y  > 240 || player.pos.y - villain.pos.y < -240){
     villain.bInCloseRangeAttack = false;
   }else{
     villain.bInCloseRangeAttack = true;
