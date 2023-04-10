@@ -45,6 +45,8 @@ loadSound("music", "assets/Bruce wang.m4a")
 
 loadSound("overtaken", "assets/Overtaken.m4a")
 
+loadSound("villain_theme", "assets/villain_theme.mp3")
+
 loadSprite("attackField", "assets/Player_Attack_Field.png")
 
 loadSprite("ball", "assets/Ball.png")
@@ -229,7 +231,7 @@ function enemyAttack(){
         ])
     bCanAttack = false;
     enemyAttackField.onCollide("player", ()=>{
-      player.hurt(10);
+      player.hurt(100);
       player.moveBy(10, 10)
         })
   
@@ -348,6 +350,12 @@ const music = play("overtaken", {
   paused: true
 });
 
+const villainTheme = play("villain_theme",{
+  volume:0.5,
+  loop:true,
+  paused: true
+});
+
 //entities:
 
 const player =  add([
@@ -367,8 +375,9 @@ const player =  add([
   "friendly",
  // Components are just plain objects, you can pass an object literal as a component.
   {
-     dead: false,
-      speed: 700
+    dead: false,
+    speed: 700,
+    bIsMoving: false
  }
 ])
 
@@ -405,6 +414,23 @@ const healthBar = player.add([
 ])
 
 healthBar.add([
+  text("hp:", {size: 25})
+])
+
+const villainHealthBarVisualisationAssistant = add([
+  rect(villain.hp(), 25),
+  color(170, 170, 170),
+  pos(0, 0),
+])
+
+
+const villainHealthBar = villainHealthBarVisualisationAssistant.add([
+  rect(villain.hp(), 25),
+  pos(0, 0),
+  color(255, 0, 0)
+])
+
+villainHealthBar.add([
   text("hp:", {size: 25})
 ])
 
@@ -554,7 +580,12 @@ scene("dungeon", ()=>{
   add(player),
   add(villain),
   add(playerAttackField),
+  music.paused = true;
+  villainTheme.paused = false;
+  add(villainHealthBarVisualisationAssistant)
   onUpdate(()=>{
+    villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - 500, player.pos.y - 350)
+    villainHealthBar.width = villain.hp()
     if(bHasLost){
       go("gameOver")
     }
@@ -663,10 +694,11 @@ onKeyPress("enter", ()=> {
 })
 
 onKeyDown("d", ()=> {
+  player.bIsMoving = true;
   resetAttack()
     player.move(player.speed, 0);
     player.flipX = false
-    if(player.curAnim() != "runHorizontal")
+    if(player.curAnim() != "runHorizontal" && player.bIsMoving)
     {
       player.play("runHorizontal");
     }
@@ -674,16 +706,14 @@ onKeyDown("d", ()=> {
     attackFieldConditionY = attackFieldPositionsY[2];
 
     player.enterState("leftRight");
-
-
-   
   });
   
   onKeyDown("a", ()=> {
+    player.bIsMoving = true;
     resetAttack()
     player.move(-player.speed, 0);
     player.flipX = true
-    if(player.curAnim() != "runHorizontal")
+    if(player.curAnim() != "runHorizontal" && player.bIsMoving)
     {
       player.play("runHorizontal");
     }
@@ -691,14 +721,13 @@ onKeyDown("d", ()=> {
     attackFieldConditionY = attackFieldPositionsY[2];
 
     player.enterState("leftRight");
-
-    
   });
   
   onKeyDown("w", ()=> {
+    player.bIsMoving = true;
     resetAttack()
     player.move(0, -player.speed);
-    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runBackward") // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
+    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runBackward" && player.bIsMoving && !isMousePressed("left")) // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
     {
       player.play("runBackward");
     }
@@ -706,15 +735,14 @@ onKeyDown("d", ()=> {
     attackFieldConditionY = attackFieldPositionsY[0];
 
     player.enterState("up");
-
-    
   });
   
   onKeyDown("s", ()=> {
+    player.bIsMoving = true;
     resetAttack()
     player.move(0, player.speed);
     
-    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward") // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
+    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward" && player.bIsMoving  && !isMousePressed("left")) // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
     {
       player.play("runForward");
     }
@@ -722,24 +750,26 @@ onKeyDown("d", ()=> {
     attackFieldConditionY = attackFieldPositionsY[1];
 
     player.enterState("down");
-
-   
   });
   
   onKeyRelease("a", ()=>{
     player.play("idle")
+    player.bIsMoving = false;
   })
   
   onKeyRelease("d", ()=>{
     player.play("idle")
+    player.bIsMoving = false;
   })
   
   onKeyRelease("w", ()=>{
     player.play("idle")
+    player.bIsMoving = false;
   })
   
   onKeyRelease("s", ()=>{
     player.play("idle")
+    player.bIsMoving = false;
   })
   
   onKeyPress("s", ()=>{
@@ -803,7 +833,9 @@ onKeyDown("d", ()=> {
   }
 
   onMousePress("left", ()=>{
-    Attack()
+    if(!player.bIsMoving){
+      Attack()
+    }
   })
 
   player.onClick(() => {
