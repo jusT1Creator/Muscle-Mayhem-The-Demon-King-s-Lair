@@ -488,8 +488,10 @@ function SpawnEnemies(posX, posY){
   function enemyHealthBar(){
     let healthBar
     let healthBarSize
+    let healthBarAssist
     return{
       healthBar(enemy){
+        healthBarAssist = enemy.add([rect(10, 1), pos(0, 0), color(170, 170,170)])
         healthBar = enemy.add([rect(10, 1), pos(0, 0), color(255, 0,0)])
       }, healthBarActualisation(enemy){
         healthBarSize = enemy.hp() / 10
