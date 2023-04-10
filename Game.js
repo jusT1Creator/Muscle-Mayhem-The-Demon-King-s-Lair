@@ -528,12 +528,18 @@ export function Game(){
   villain.setCanAttack(true),
   resetPlayerHealth(),
   addLevel([
-    "||||||",
+
+    "^^^^",
+    "^^^^",
+    "^^^^",
+    "^^^^",
+
+    /*"||||||",
     "|^^^^|",
     "|^^^^|",
     "|^^^^|",
     "|^^^^|",
-    "||||||",
+    "||||||",*/
   ], {
     tileWidth: 2048,
     tileHeight: 2048,
@@ -543,11 +549,11 @@ export function Game(){
             anchor("center"),
             "background",
         ],
-        "|": () => [
-          sprite("play"),
+        /*"|": () => [
+          sprite("attackField"),
           anchor("center"),
           "background",
-        ],
+        ],*/
     },
   }),
   //add(obunga),
