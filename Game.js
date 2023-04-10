@@ -553,7 +553,7 @@ export function Game(){
   loadBackground("grass", 2, 0),
   loadBackground("grass", -2, 0),
   loadBackground("grass", 0, -2),
-  loadBackground("grass", -2, -2),
+  loadBackground("grass", -2, -2), */
   //add(obunga),
   add(player),
   //add(villain),
