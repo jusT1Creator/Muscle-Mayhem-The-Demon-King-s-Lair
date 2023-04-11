@@ -704,7 +704,7 @@ setBackground(BLACK, 1),
   add(villain),
   add(playerAttackField),
   villain.pos = vec2(700, 0);
-  villain.setHP(10);
+  villain.setHP(1000);
   music.paused = true;
   villainTheme.paused = false;
   villainTheme.seek(0);
