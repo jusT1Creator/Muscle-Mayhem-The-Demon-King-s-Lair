@@ -19,6 +19,7 @@ setGravity(0)
 document.body.style.overflow = 'hidden';
 
 //sprites:
+loadSprite("castle", "assets/Castle for game.png")
 
 loadSprite("toitoi", "assets/toi toi for game.png")
 
@@ -347,6 +348,34 @@ function villainAttack(){
   }
 }
 
+function castle(){
+  return{
+     SpawnEnemies(posX, posY){
+      const slime = add([
+        sprite("slime",{
+          anim: "runForward"
+        }),
+        area({ 
+          scale: vec2(0.5, 0.5),
+        }),
+        scale(vec2(5, 5)),
+        pos(posX, posY),
+        health(100),
+        anchor("center"),
+        enemyAttack(),
+        enemyHealthBar(),
+        state("idle", ["idle", "attack"]),
+        "enemy",
+        "slime",
+        {
+          bIsDead: false
+        }
+      ])
+      slime.healthBar(slime)
+    }
+  }
+}
+
 function projectieDestructionManager(){
   return{
     explosion(projectile){
@@ -584,17 +613,16 @@ export function Game(){
           "background",
         ],
         "|": () => [
-          sprite("attackField"),
+          sprite("grass"),
           anchor("center"),
-          scale(vec2(24, 12)),
           area(),
           body({ isStatic: true }),
           "wall",
         ],
     },
-  }),
-  addLevel([
-    "t",
+  })
+  const props = addLevel([
+    "c    c     c     c  t",
   ], {
     tileWidth: 400,
     tileHeight: 400,
@@ -606,8 +634,21 @@ export function Game(){
         area(),
         "portal",
       ],
+      "c": ()=> [
+        sprite("castle"),
+        anchor("center"),
+        area(),
+        castle(),
+        pos(),
+        "castle",
+        {
+          bCanSpwanEnemies: true,
+          NumberOfEnemies: 1,
+          castleId: 1
+        },
+      ]
     },
-  }),
+  })
   //add(obunga),
   add(player),
   //add(villain),
@@ -649,16 +690,36 @@ export function Game(){
     }
 
   }),
+
+  
   onUpdate(()=>{
     if(bHasLost){
       go("gameOver")
-      
     }
   })
+
+  const allCastles = props.get("castle")
+
+  for(let i = 0; i < allCastles.length; i++){
+    allCastles[i].NumberOfEnemies = i + 1
+    allCastles[i].castleId = i
+  }
 }
+
+
 
 player.onCollide("portal", ()=>{
   go("dungeon")
+})
+
+player.onCollide("castle", async (Castle)=>{
+  if(Castle.bCanSpwanEnemies == true){
+    for(let i = 0; i < Castle.NumberOfEnemies; i++){
+      await wait(1)
+      Castle.SpawnEnemies(Castle.worldPos().x, Castle.worldPos().y);
+    }
+    Castle.bCanSpwanEnemies = false;
+  }
 })
 
 scene("dungeon", ()=>{
