@@ -87,7 +87,7 @@ addButton("Credits", vec2(200, 200), () => {
 
 
 const txt = add([
-	text("I welcome you to our game,\nyour objective is to find the way\nto the secret layer of the villain and beat him.\nHowever this is no easy task,\nthe way is guarded by a hoard of slimes\naiming to beat you up!\nAre you ready for the challenge?", 
+	text("I welcome you to our game,\nyour objective is to find the way\nto the secret lair of the villain and beat him.\nHowever this is no easy task,\nthe way is guarded by a hoard of slimes\naiming to beat you up!\nAre you ready for the challenge?", 
 	{ size: 32, width: width() - 230, align: "left" }),
 	pos(800, 700),
 	anchor("center"),

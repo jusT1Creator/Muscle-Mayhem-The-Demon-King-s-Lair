@@ -1,8 +1,10 @@
 import k from "./kabam.js"
 import { GameOver } from "./GameOver.js";
+import { GameWon } from "./GameWon.js";
 
 
 scene("gameOver", GameOver)
+scene("gameWon", GameWon)
 
 let attackFieldPositionsX = [70, -70, 0];
 let attackFieldPositionsY = [-75, 75, 0];
@@ -210,6 +212,9 @@ loadSprite("slam_effect", "assets/slam_effect_spritesheet.png",{
     }
   }
 })
+
+loadSprite("dungeon_wall", "assets/Wall_Villain_Dungeon.png")
+loadSprite("dungeon_floor", "assets/Floor_Villain_Dungeon.png")
 //components
 
 
@@ -528,6 +533,7 @@ function resetPlayerHealth(){
 }
 
 export function Game(){
+  music.seek(0)
   bHasLost = false
   player.pos = vec2(0,0),
   villain.enterState("idle"),
@@ -620,13 +626,49 @@ export function Game(){
   }),
   onUpdate(()=>{
     if(bHasLost){
-      //go("gameOver")
-      go("dungeon")
+      go("gameOver")
+      
     }
   })
 }
 
+player.onCollide("portal", ()=>{
+  go("dungeon")
+})
+
 scene("dungeon", ()=>{
+  addLevel([
+    "|||||||",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|||||||",
+  ], {
+    tileWidth: 520,
+    tileHeight: 520,
+    pos: vec2(-1560, -1560),
+    tiles: {
+        "^": () => [
+          sprite("dungeon_floor"),
+          scale(10, 10),
+          anchor("center"),
+          "floor",
+        ],
+        "|": () => [
+          sprite("dungeon_wall"),
+          anchor("center"),
+          scale(20, 20),
+          area(),
+          body({ isStatic: true }),
+          "Dwall",
+        ],
+    },
+  }),
+
+setBackground(BLACK, 1),
+
   bHasLost = false,
   player.pos = vec2(0,0),
   villain.enterState("idle"),
@@ -636,8 +678,11 @@ scene("dungeon", ()=>{
   add(player),
   add(villain),
   add(playerAttackField),
+  villain.pos = vec2(700, 0);
+  villain.setHP(10);
   music.paused = true;
   villainTheme.paused = false;
+  villainTheme.seek(0);
   add(villainHealthBarVisualisationAssistant)
   onUpdate(()=>{
     villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - 500, player.pos.y - 350)
@@ -741,6 +786,8 @@ villain.onStateEnter("idle", ()=>{
 })
 
 villain.on("death", () => {
+  go("gameWon")
+  villainTheme.paused = true;
   villain.destroy()
 })
 
