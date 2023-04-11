@@ -540,6 +540,30 @@ export function Game(){
   villain.bAttackStateCalled = false,
   villain.setCanAttack(true),
   resetPlayerHealth(),
+  /*addLevel([
+    " ====== ",
+    "|      |",
+    "|      |",
+    "|      |",
+    "|      |",
+    "|      |",
+    "|======|",
+  ], {
+    tileWidth: 128,
+    tileHeight: 128,
+    pos: vec2(-2000, -2000),
+    tiles: {
+      "=": () => [
+        sprite("horWall"),
+        anchor("bot"),
+        "horizontalWall",
+      ],
+      "|": () => [
+        sprite("verWall")
+        anchor("")
+      ]
+    }
+  })*/
   addLevel([
     "||||||||",
     "|^^^^^^|",
@@ -560,8 +584,9 @@ export function Game(){
           "background",
         ],
         "|": () => [
-          sprite("grass"),
+          sprite("attackField"),
           anchor("center"),
+          scale(vec2(24, 12)),
           area(),
           body({ isStatic: true }),
           "wall",
