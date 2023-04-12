@@ -11,6 +11,9 @@ let attackFieldPositionsY = [-75, 75, 0];
 let attackFieldConditionX = attackFieldPositionsX[0];
 let attackFieldConditionY = attackFieldPositionsY[2];
 
+let allCastles = []
+let toitoi = null
+
 setGravity(0)
 
 //debug.inspect = true
@@ -19,6 +22,8 @@ setGravity(0)
 document.body.style.overflow = 'hidden';
 
 //sprites:
+loadSprite("guiding_spirit", "assets/guiding_spirit.png")
+
 loadSprite("castle", "assets/Castle for game.png")
 
 loadSprite("toitoi", "assets/toi toi for game.png")
@@ -28,6 +33,8 @@ loadSprite("grass", "assets/Grass_Background.png");
 loadSprite("obunga", "assets/OIP.png");
 
 loadSprite("player", "assets/Ball.png");
+
+loadSound("motivation_music", "assets/motivation_music.mp3")
 
 loadSound("music", "assets/Bruce wang.m4a")
 
@@ -350,7 +357,7 @@ function villainAttack(){
 
 function castle(){
   return{
-     SpawnEnemies(posX, posY){
+     SpawnEnemies(posX, posY, id){
       const slime = add([
         sprite("slime",{
           anim: "runForward"
@@ -360,7 +367,7 @@ function castle(){
         }),
         scale(vec2(5, 5)),
         pos(posX, posY),
-        health(100),
+        health(50),
         anchor("center"),
         enemyAttack(),
         enemyHealthBar(),
@@ -368,10 +375,50 @@ function castle(){
         "enemy",
         "slime",
         {
-          bIsDead: false
+          bIsDead: false,
+          castleAffiliation: 0
         }
       ])
       slime.healthBar(slime)
+      slime.castleAffiliation = id
+    }, soldierDefeated(Castle){
+      Castle.NumberOfEnemies--
+
+      if(Castle.NumberOfEnemies == 0){
+        Castle.bCastleCleared = true;
+      }
+
+      if(Castle.bCastleCleared && Castle.castleId != allCastles.length - 1){
+        const guidingSpirit = add([
+          pos(allCastles[Castle.castleId].worldPos()),
+          sprite("guiding_spirit"),
+          castleGuide(),
+          "guide",
+          {
+            speed: 150
+          }
+        ])
+        allCastles[Castle.castleId + 1].bCanSpwanEnemies = true
+        guidingSpirit.onUpdate(()=>{
+          guidingSpirit.guide(Castle.castleId, guidingSpirit)
+          if(guidingSpirit.pos.x - allCastles[Castle.castleId + 1].worldPos().x <= 10 && guidingSpirit.pos.x - allCastles[Castle.castleId + 1].worldPos().x >= -10){
+            guidingSpirit.destroy()
+          }
+        })
+      } else if(Castle.castleId == allCastles.length -1){
+        toitoi.bCanTP = true
+      }
+
+      
+    }
+  }
+}
+
+function castleGuide(){
+  return{
+    guide(castleId, guide){
+      const dir = allCastles[castleId + 1].worldPos().sub(guide.pos).unit()
+      guide.move(dir.scale(guide.speed))
     }
   }
 }
@@ -409,7 +456,15 @@ const villainTheme = play("villain_theme",{
   paused: true
 });
 
+const motivationMusic = play("motivation_music",{
+  volume: 0.7,
+  loop: true,
+  paused: true
+})
+
 //entities:
+
+
 
 const player =  add([
   z(5),
@@ -500,7 +555,7 @@ const playerAttackField = add([
 ])
 
 
-function SpawnEnemies(posX, posY){
+/*function SpawnEnemies(posX, posY){
   const slime = add([
     sprite("slime",{
       anim: "runForward"
@@ -510,7 +565,7 @@ function SpawnEnemies(posX, posY){
     }),
     scale(vec2(5, 5)),
     pos(posX, posY),
-    health(100),
+    health(50),
     anchor("center"),
     enemyAttack(),
     enemyHealthBar(),
@@ -522,7 +577,7 @@ function SpawnEnemies(posX, posY){
     }
   ])
   slime.healthBar(slime)
-}
+}*/
 
   function enemyHealthBar(){
     let healthBar
@@ -530,8 +585,8 @@ function SpawnEnemies(posX, posY){
     let healthBarAssist
     return{
       healthBar(enemy){
-        healthBarAssist = enemy.add([rect(10, 1), pos(0, 0), color(170, 170,170)])
-        healthBar = enemy.add([rect(10, 1), pos(0, 0), color(255, 0,0)])
+        healthBarAssist = enemy.add([rect(5, 1), pos(0, 0), color(170, 170,170)])
+        healthBar = enemy.add([rect(5, 1), pos(0, 0), color(255, 0,0)])
       }, healthBarActualisation(enemy){
         healthBarSize = enemy.hp() / 10
         healthBar.width = healthBarSize;
@@ -560,6 +615,8 @@ function resetPlayerHealth(){
   let ValueToReset = 100 - player.hp();
   player.heal(ValueToReset);
 }
+
+
 
 export function Game(){
   music.seek(0)
@@ -639,6 +696,9 @@ export function Game(){
           scale: vec2(0.25, 0.25)
         }),
         "portal",
+        {
+          bCanTP: false
+        }
       ],
       "c": ()=> [
         sprite("castle"),
@@ -648,19 +708,20 @@ export function Game(){
         pos(),
         "castle",
         {
-          bCanSpwanEnemies: true,
+          bCanSpwanEnemies: false,
           NumberOfEnemies: 1,
-          castleId: 1
+          castleId: 1,
+          bCastleCleared: false
         },
       ]
     },
   })
   //add(obunga),
+  allCastles = props.get("castle")
+  toitoi = props.get("portal")[0]
   add(player),
-  //add(villain),
   add(playerAttackField),
-  SpawnEnemies(1000, 1000),
-  SpawnEnemies(500, 500),
+
   onUpdate("slime", (enemy)=>{
     enemy.healthBarActualisation(enemy)
     const dir = player.pos.sub(enemy.pos).unit()
@@ -690,7 +751,10 @@ export function Game(){
       enemy.bIsDead = true
       if(enemy.curAnim() != "death"){
         enemy.play("death", {
-          onEnd: ()=>  destroy(enemy)
+          onEnd: ()=>  {
+            destroy(enemy)
+            allCastles[enemy.castleAffiliation].soldierDefeated(allCastles[enemy.castleAffiliation])
+          }
         })
       }
     }
@@ -704,7 +768,8 @@ export function Game(){
     }
   })
 
-  const allCastles = props.get("castle")
+  allCastles[0].bCanSpwanEnemies = true
+  
 
   for(let i = 0; i < allCastles.length; i++){
     allCastles[i].NumberOfEnemies = i + 1
@@ -715,16 +780,20 @@ export function Game(){
 
 
 player.onCollide("portal", ()=>{
-  go("dungeon")
+  if(toitoi.bCanTP){
+    go("dungeon")
+  }
+ 
 })
 
 player.onCollide("castle", async (Castle)=>{
   if(Castle.bCanSpwanEnemies == true){
+    Castle.bCanSpwanEnemies = false;
     for(let i = 0; i < Castle.NumberOfEnemies; i++){
       await wait(1)
-      Castle.SpawnEnemies(Castle.worldPos().x, Castle.worldPos().y);
+      Castle.SpawnEnemies(Castle.worldPos().x, Castle.worldPos().y, Castle.castleId);
     }
-    Castle.bCanSpwanEnemies = false;
+    
   }
 })
 
@@ -781,6 +850,11 @@ setBackground(BLACK, 1),
     villainHealthBar.width = villain.hp()
     if(bHasLost){
       go("gameOver")
+      villainTheme.paused = true;
+      motivationMusic.paused = true;
+    }
+    if(villain.hp() <= 150){
+      motivationMusic.paused = false;
       villainTheme.paused = true;
     }
   })
@@ -881,6 +955,7 @@ villain.on("death", () => {
   go("gameWon")
   villainTheme.paused = true;
   villain.destroy()
+  motivationMusic.paused = true;
 })
 
 
@@ -1039,7 +1114,7 @@ onKeyDown("d", ()=> {
   })
 
   player.onClick(() => {
-    debug.log("uhcuwhiwfwin")
+    
   })
 
  
@@ -1155,32 +1230,32 @@ let attackedEnemy
     
     let knockBackForce = 6;
     if(isCollidingWithEnemy){
-      let Dmg = 25;
+      let Dmg = 15;
     if(player.state === "leftRight")
     {
       if(comboStateHorizontal == 1){
-        Dmg = 12;
+        Dmg = 50;
         knockBackForce = 1
       }
       else if(comboStateHorizontal == 2){
-        Dmg = 17;
+        Dmg = 7;
         knockBackForce = 1
       }
       else if(comboStateHorizontal == 3){
-        Dmg = 22;
+        Dmg = 12;
         knockBackForce = 2
       }
     }
 
     if(player.state === "down" ){
       if(comboStateDown == 1){
-        Dmg = 14;
+        Dmg = 10;
       }
     }
 
     if( player.state === "up"){
       if(comboStateUp == 1){
-        Dmg = 14;
+        Dmg = 10;
       }
     }
 
