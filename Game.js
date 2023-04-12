@@ -1257,7 +1257,7 @@ let attackedEnemy
     if(player.state === "leftRight")
     {
       if(comboStateHorizontal == 1){
-        Dmg = 50;
+        Dmg = 5;
         knockBackForce = 1
       }
       else if(comboStateHorizontal == 2){
