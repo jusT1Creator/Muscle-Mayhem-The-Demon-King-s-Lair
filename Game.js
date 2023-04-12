@@ -536,25 +536,29 @@ export function Game(){
   resetPlayerHealth(),
   /*addLevel([
     " ====== ",
-    "|      |",
-    "|      |",
-    "|      |",
-    "|      |",
-    "|      |",
-    "|======|",
+    "l      r",
+    "l      r",
+    "l      r",
+    "l      r",
+    "l      r",
+    "l======r",
   ], {
-    tileWidth: 128,
-    tileHeight: 128,
-    pos: vec2(-2000, -2000),
+    tileWidth: 2048,
+    tileHeight: 2048,
+    pos: vec2(-2048, -2048),
     tiles: {
       "=": () => [
         sprite("horWall"),
         anchor("bot"),
         "horizontalWall",
       ],
-      "|": () => [
+      "l": () => [
         sprite("verWall")
-        anchor("")
+        anchor("right")
+      ]
+      "r": () => [
+        sprite("verWall")
+        anchor("left")
       ]
     }
   })*/
@@ -570,7 +574,7 @@ export function Game(){
   ], {
     tileWidth: 2048,
     tileHeight: 2048,
-    pos: vec2(-2000, -2000),
+    pos: vec2(-2048, -2048),
     tiles: {
         "^": () => [
           sprite("grass"),
