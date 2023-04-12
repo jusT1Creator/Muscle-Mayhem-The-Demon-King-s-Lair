@@ -13,6 +13,7 @@ let attackFieldConditionY = attackFieldPositionsY[2];
 
 let allCastles = []
 let toitoi = null
+export let bHasEnteredDungeon = false
 
 setGravity(0)
 
@@ -382,9 +383,9 @@ function castle(){
       slime.healthBar(slime)
       slime.castleAffiliation = id
     }, soldierDefeated(Castle){
-      Castle.NumberOfEnemies--
+      Castle.bEnemiesToDefeat--
 
-      if(Castle.NumberOfEnemies == 0){
+      if(Castle.bEnemiesToDefeat == 0){
         Castle.bCastleCleared = true;
       }
 
@@ -401,12 +402,30 @@ function castle(){
         allCastles[Castle.castleId + 1].bCanSpwanEnemies = true
         guidingSpirit.onUpdate(()=>{
           guidingSpirit.guide(Castle.castleId, guidingSpirit)
-          if(guidingSpirit.pos.x - allCastles[Castle.castleId + 1].worldPos().x <= 10 && guidingSpirit.pos.x - allCastles[Castle.castleId + 1].worldPos().x >= -10){
+          if(guidingSpirit.pos.x - allCastles[Castle.castleId + 1].worldPos().x <= 10 && guidingSpirit.pos.x - allCastles[Castle.castleId + 1].worldPos().x >= -10
+          && guidingSpirit.pos.y - allCastles[Castle.castleId + 1].worldPos().y <= 10 && guidingSpirit.pos.y - allCastles[Castle.castleId + 1].worldPos().y >= -10){
             guidingSpirit.destroy()
           }
         })
-      } else if(Castle.castleId == allCastles.length -1){
+      } else if(Castle.bCastleCleared && Castle.castleId == allCastles.length -1){
         toitoi.bCanTP = true
+        const guidingSpirit = add([
+          pos(allCastles[Castle.castleId].worldPos()),
+          sprite("guiding_spirit"),
+          castleGuide(),
+          "guide",
+          {
+            speed: 150
+          }
+        ])
+
+        guidingSpirit.onUpdate(()=>{
+          guidingSpirit.toitoiGuide(guidingSpirit)
+          if(guidingSpirit.pos.x - toitoi.worldPos().x <= 10 && guidingSpirit.pos.x - toitoi.worldPos().x >= -10 
+          && guidingSpirit.pos.y - toitoi.worldPos().y <= 10 && guidingSpirit.pos.y - toitoi.worldPos().y >= -10){
+            guidingSpirit.destroy()
+          }
+        })
       }
 
       
@@ -418,6 +437,9 @@ function castleGuide(){
   return{
     guide(castleId, guide){
       const dir = allCastles[castleId + 1].worldPos().sub(guide.pos).unit()
+      guide.move(dir.scale(guide.speed))
+    }, toitoiGuide(guide){
+      const dir = toitoi.worldPos().sub(guide.pos).unit()
       guide.move(dir.scale(guide.speed))
     }
   }
@@ -619,6 +641,7 @@ function resetPlayerHealth(){
 
 
 export function Game(){
+  bHasEnteredDungeon = false
   music.seek(0)
   bHasLost = false
   player.pos = vec2(0,0),
@@ -711,7 +734,8 @@ export function Game(){
           bCanSpwanEnemies: false,
           NumberOfEnemies: 1,
           castleId: 1,
-          bCastleCleared: false
+          bCastleCleared: false,
+          bEnemiesToDefeat: 1
         },
       ]
     },
@@ -774,6 +798,7 @@ export function Game(){
   for(let i = 0; i < allCastles.length; i++){
     allCastles[i].NumberOfEnemies = i + 1
     allCastles[i].castleId = i
+    allCastles[i].bEnemiesToDefeat = allCastles[i].NumberOfEnemies
   }
 }
 
@@ -797,7 +822,10 @@ player.onCollide("castle", async (Castle)=>{
   }
 })
 
-scene("dungeon", ()=>{
+scene("dungeon", Dungeon)
+
+export function Dungeon(){
+  bHasEnteredDungeon = true
   addLevel([
     "|||||||",
     "|^^^^^|",
@@ -858,7 +886,7 @@ setBackground(BLACK, 1),
       villainTheme.paused = true;
     }
   })
-})
+}
 
 let villainLookState = 2
 let villainLookDirection = 2
@@ -962,11 +990,6 @@ villain.on("death", () => {
 
 //input
 
-onKeyPress("enter", ()=> {
- for(let i = 1; i < 50; i++){ 
-  SpawnEnemies(i* 100 , i* 100)
-}
-})
 
 onKeyDown("d", ()=> {
   player.bIsMoving = true;

@@ -1,9 +1,12 @@
 import k from "./kabam.js"
 import { Game } from "./Game.js";
 import { Start } from "./Start.js";
-import music from "./Game.js";
+import music  from "./Game.js";
+import { Dungeon } from "./Game.js";
+import { bHasEnteredDungeon } from "./Game.js";
 
 scene("game", Game)
+scene("dungeon", Dungeon)
 scene("start", Start)
 
 export function GameOver(){
@@ -55,8 +58,13 @@ function addButton(txt, p, f) {
 
 }
 
-addButton("Start", vec2(900, 500), () => {
-	go("game")
+addButton("retry", vec2(900, 500), () => {
+	if(bHasEnteredDungeon){
+		go("dungeon")
+	}else{
+		go("game")
+	}
+
 	music.paused = false;
 })
 addButton("Go to home Screen", vec2(900, 600), () => {

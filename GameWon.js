@@ -1,6 +1,5 @@
 import k from "./kabam.js"
 import { Start } from "./Start.js";
-import music from "./Game.js";
 import { Credits } from "./Credits.js";
 
 scene("credits", Credits)
