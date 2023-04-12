@@ -635,7 +635,9 @@ export function Game(){
       "t": () => [
         sprite("toitoi"),
         anchor("center"),
-        area(),
+        area({
+          scale: vec2(0.25, 0.25)
+        }),
         "portal",
       ],
       "c": ()=> [
