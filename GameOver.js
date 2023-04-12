@@ -7,11 +7,7 @@ scene("game", Game)
 scene("start", Start)
 
 export function GameOver(){
-	add([
-		pos(0, 0),
-		rect(5000, 5000),
-		color(0, 0, 0)
-	])
+	setBackground(BLACK, 1),
     onUpdate(() => setCursor("default")),
 	onUpdate(()=>{
 		music.paused = true;

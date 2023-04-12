@@ -1,8 +1,10 @@
 import k from "./kabam.js"
 import { GameOver } from "./GameOver.js";
+import { GameWon } from "./GameWon.js";
 
 
 scene("gameOver", GameOver)
+scene("gameWon", GameWon)
 
 let attackFieldPositionsX = [70, -70, 0];
 let attackFieldPositionsY = [-75, 75, 0];
@@ -17,6 +19,7 @@ setGravity(0)
 document.body.style.overflow = 'hidden';
 
 //sprites:
+loadSprite("castle", "assets/Castle for game.png")
 
 loadSprite("toitoi", "assets/toi toi for game.png")
 
@@ -210,6 +213,9 @@ loadSprite("slam_effect", "assets/slam_effect_spritesheet.png",{
     }
   }
 })
+
+loadSprite("dungeon_wall", "assets/Wall_Villain_Dungeon.png")
+loadSprite("dungeon_floor", "assets/Floor_Villain_Dungeon.png")
 //components
 
 
@@ -338,6 +344,34 @@ function villainAttack(){
       })
     
      }
+    }
+  }
+}
+
+function castle(){
+  return{
+     SpawnEnemies(posX, posY){
+      const slime = add([
+        sprite("slime",{
+          anim: "runForward"
+        }),
+        area({ 
+          scale: vec2(0.5, 0.5),
+        }),
+        scale(vec2(5, 5)),
+        pos(posX, posY),
+        health(100),
+        anchor("center"),
+        enemyAttack(),
+        enemyHealthBar(),
+        state("idle", ["idle", "attack"]),
+        "enemy",
+        "slime",
+        {
+          bIsDead: false
+        }
+      ])
+      slime.healthBar(slime)
     }
   }
 }
@@ -528,6 +562,7 @@ function resetPlayerHealth(){
 }
 
 export function Game(){
+  music.seek(0)
   bHasLost = false
   player.pos = vec2(0,0),
   villain.enterState("idle"),
@@ -582,17 +617,16 @@ export function Game(){
           "background",
         ],
         "|": () => [
-          sprite("attackField"),
+          sprite("grass"),
           anchor("center"),
-          scale(vec2(24, 12)),
           area(),
           body({ isStatic: true }),
           "wall",
         ],
     },
-  }),
-  addLevel([
-    "t",
+  })
+  const props = addLevel([
+    "c    c     c     c  t",
   ], {
     tileWidth: 400,
     tileHeight: 400,
@@ -604,8 +638,21 @@ export function Game(){
         area(),
         "portal",
       ],
+      "c": ()=> [
+        sprite("castle"),
+        anchor("center"),
+        area(),
+        castle(),
+        pos(),
+        "castle",
+        {
+          bCanSpwanEnemies: true,
+          NumberOfEnemies: 1,
+          castleId: 1
+        },
+      ]
     },
-  }),
+  })
   //add(obunga),
   add(player),
   //add(villain),
@@ -647,15 +694,71 @@ export function Game(){
     }
 
   }),
+
+  
   onUpdate(()=>{
     if(bHasLost){
-      //go("gameOver")
-      go("dungeon")
+      go("gameOver")
     }
   })
+
+  const allCastles = props.get("castle")
+
+  for(let i = 0; i < allCastles.length; i++){
+    allCastles[i].NumberOfEnemies = i + 1
+    allCastles[i].castleId = i
+  }
 }
 
+
+
+player.onCollide("portal", ()=>{
+  go("dungeon")
+})
+
+player.onCollide("castle", async (Castle)=>{
+  if(Castle.bCanSpwanEnemies == true){
+    for(let i = 0; i < Castle.NumberOfEnemies; i++){
+      await wait(1)
+      Castle.SpawnEnemies(Castle.worldPos().x, Castle.worldPos().y);
+    }
+    Castle.bCanSpwanEnemies = false;
+  }
+})
+
 scene("dungeon", ()=>{
+  addLevel([
+    "|||||||",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|^^^^^|",
+    "|||||||",
+  ], {
+    tileWidth: 520,
+    tileHeight: 520,
+    pos: vec2(-1560, -1560),
+    tiles: {
+        "^": () => [
+          sprite("dungeon_floor"),
+          scale(10, 10),
+          anchor("center"),
+          "floor",
+        ],
+        "|": () => [
+          sprite("dungeon_wall"),
+          anchor("center"),
+          scale(20, 20),
+          area(),
+          body({ isStatic: true }),
+          "Dwall",
+        ],
+    },
+  }),
+
+setBackground(BLACK, 1),
+
   bHasLost = false,
   player.pos = vec2(0,0),
   villain.enterState("idle"),
@@ -665,8 +768,11 @@ scene("dungeon", ()=>{
   add(player),
   add(villain),
   add(playerAttackField),
+  villain.pos = vec2(700, 0);
+  villain.setHP(1000);
   music.paused = true;
   villainTheme.paused = false;
+  villainTheme.seek(0);
   add(villainHealthBarVisualisationAssistant)
   onUpdate(()=>{
     villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - 500, player.pos.y - 350)
@@ -770,6 +876,8 @@ villain.onStateEnter("idle", ()=>{
 })
 
 villain.on("death", () => {
+  go("gameWon")
+  villainTheme.paused = true;
   villain.destroy()
 })
 

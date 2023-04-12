@@ -1,19 +1,17 @@
 import k from "./kabam.js"
-import music from "./Game.js";
 import { Start } from "./Start.js";
+import music from "./Game.js";
+import { Credits } from "./Credits.js";
 
+scene("credits", Credits)
 scene("start", Start)
 
-export function Credits(){
+loadSound("StartMusic", "assets/Aot relaxing music.m4a")
 
-	setBackground(BLACK, 1),
-    onUpdate(() => setCursor("default")),
-	onUpdate(()=>{
-		//if (Startmusic.paused) {
-		//	Startmusic.play()
-		//}
-		music.paused = true;
-	})
+
+export function GameWon(){
+    setBackground(WHITE, 1),
+    onUpdate(() => setCursor("default"))
 function addButton(txt, p, f) {
 
 	// add a parent background object
@@ -57,19 +55,18 @@ function addButton(txt, p, f) {
 
 }
 
-addButton("Return to home screen", vec2(900, 700), () => {
-	go("start")
-	music.paused = true;
-	//Startmusic.paused = true;
-})
-
-
 const txt = add([
-	text("This game was developed and designed by: \nDe Simone Tiziano\nSklodowski Marcin\nSamayoa-Usher Ian Enrique\nJacobs Nathan\nMusic used: [insert music name|creator]", 
-    { size: 32, width: width() - 230, align: "center" }),
+	text("You WON!!", { size: 32, width: width() - 230, align: "center" }),
 	pos(900, 400),
 	anchor("center"),
-	color(255, 255, 255),
+	color(0, 255, 0),
 ])
+
+addButton("Return to home screen", vec2(900, 500), () => {
+	go("start")
+})
+addButton("Credits", vec2(900, 600), () => {
+	go("credits")
+})
 
 }
