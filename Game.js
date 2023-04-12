@@ -1155,32 +1155,32 @@ let attackedEnemy
     
     let knockBackForce = 6;
     if(isCollidingWithEnemy){
-      let Dmg = 15;
+      let Dmg = 25;
     if(player.state === "leftRight")
     {
       if(comboStateHorizontal == 1){
-        Dmg = 5;
+        Dmg = 12;
         knockBackForce = 1
       }
       else if(comboStateHorizontal == 2){
-        Dmg = 7;
+        Dmg = 17;
         knockBackForce = 1
       }
       else if(comboStateHorizontal == 3){
-        Dmg = 10;
+        Dmg = 22;
         knockBackForce = 2
       }
     }
 
     if(player.state === "down" ){
       if(comboStateDown == 1){
-        Dmg = 10;
+        Dmg = 14;
       }
     }
 
     if( player.state === "up"){
       if(comboStateUp == 1){
-        Dmg = 10;
+        Dmg = 14;
       }
     }
 
