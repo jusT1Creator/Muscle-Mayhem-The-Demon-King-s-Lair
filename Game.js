@@ -402,7 +402,7 @@ function castle(){
           castleGuide(),
           "guide",
           {
-            speed: 150
+            speed: 250
           }
         ])
         allCastles[Castle.castleId + 1].bCanSpwanEnemies = true
@@ -421,7 +421,7 @@ function castle(){
           castleGuide(),
           "guide",
           {
-            speed: 150
+            speed: 250
           }
         ])
 
@@ -712,11 +712,23 @@ export function Game(){
     },
   })
   const props = addLevel([
-    "c    c     c     c  t",
+    "c",
+    "         c",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "  c",
+    "                          c",
+    "",
+    "         c",
+    "                         t",
   ], {
     tileWidth: 400,
     tileHeight: 400,
-    pos: vec2(2000, 2000),
+    pos: vec2(900, 0),
     tiles: {
       "t": () => [
         sprite("toitoi"),
@@ -887,7 +899,7 @@ setBackground(BLACK, 1),
       villainTheme.paused = true;
       motivationMusic.paused = true;
     }
-    if(villain.hp() <= 150){
+    if(villain.hp() <= 370){
       motivationMusic.paused = false;
       villainTheme.paused = true;
     }
@@ -989,7 +1001,7 @@ villain.on("death", () => {
   go("gameWon")
   villainTheme.paused = true;
   villain.destroy()
-  motivationMusic.paused = true;
+  motivationMusic.paused = false;
 })
 
 
@@ -1031,7 +1043,7 @@ onKeyDown("d", ()=> {
     player.bIsMoving = true;
     resetAttack()
     player.move(0, -player.speed);
-    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runBackward" && player.bIsMoving && !isMousePressed("left")) // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
+    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runBackward" && player.bIsMoving && !isMousePressed("left") && !isKeyDown("a") && !isKeyDown("d") ) // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
     {
       player.play("runBackward");
     }
@@ -1046,7 +1058,7 @@ onKeyDown("d", ()=> {
     resetAttack()
     player.move(0, player.speed);
     
-    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward" && player.bIsMoving  && !isMousePressed("left")) // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
+    if(player.curAnim() != "runHorizontal" && player.curAnim() != "runForward" && player.bIsMoving  && !isMousePressed("left") && !isKeyDown("a") && !isKeyDown("d")) // I make sure going left and right animation takes priority, yet we might want to make a player state to handle it better
     {
       player.play("runForward");
     }
@@ -1142,11 +1154,35 @@ onKeyDown("d", ()=> {
     }
   })
 
-  player.onClick(() => {
+  onMousePress("right", () => {
+    let bShouldFlip = false
+    if(player.flipX == true)
+    {
+      bShouldFlip = true
+    }
     
+      if(player.curAnim() != "heal" && player.bIsMoving == false)
+      {
+        player.use(sprite("Bruce_Wang"))
+        player.flipX = bShouldFlip
+        player.play("heal", {
+          onEnd: ()=>{
+            if(player.hp() <= 95){
+              playerHeal(5)
+            } else if(player.hp() < 100 && player.hp() > 95){
+             playerHeal(100 - player.hp())
+            }
+          }
+        });
+      }
   })
 
- 
+ async function playerHeal(healAmount){
+  player.heal(healAmount)
+  healthBar.color = GREEN
+  await wait(0.15)
+  healthBar.color = RED
+ }
 
   
 
