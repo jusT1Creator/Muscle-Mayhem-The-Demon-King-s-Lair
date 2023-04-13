@@ -66,7 +66,7 @@ loadSprite("projectile_explosion", "assets/projectile_explosion_spritesheet.png"
 
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
-  sliceY:9,
+  sliceY:11,
   anims:{
     idle:{
       from: 0,
@@ -115,6 +115,12 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       to: 35,
       loop: false,
       speed: 12
+    },
+    heal:{
+      from: 36,
+      to: 42,
+      loop:false,
+      speed:10
     }
   },
 
