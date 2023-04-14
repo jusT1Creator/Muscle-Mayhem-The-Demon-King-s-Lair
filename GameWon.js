@@ -6,11 +6,19 @@ scene("credits", Credits)
 scene("start", Start)
 
 loadSound("StartMusic", "assets/Aot relaxing music.m4a")
+loadSound("music", "assets/Bruce wang.m4a")
+
+const victoryMusic = play("music", {
+	volume: 0.7,
+	loop: true,
+	paused: true
+})
 
 
 export function GameWon(){
     setBackground(WHITE, 1),
-    onUpdate(() => setCursor("default"))
+    onUpdate(() => setCursor("default")),
+	victoryMusic.paused = false
 function addButton(txt, p, f) {
 
 	// add a parent background object
@@ -63,9 +71,11 @@ const txt = add([
 
 addButton("Return to home screen", vec2(900, 500), () => {
 	go("start")
+	victoryMusic.paused = true
 })
 addButton("Credits", vec2(900, 600), () => {
 	go("credits")
+	victoryMusic.paused = true
 })
 
 }

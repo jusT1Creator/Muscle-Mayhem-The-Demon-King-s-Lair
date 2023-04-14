@@ -37,7 +37,6 @@ loadSprite("player", "assets/Ball.png");
 
 loadSound("motivation_music", "assets/motivation_music.mp3")
 
-loadSound("music", "assets/Bruce wang.m4a")
 
 loadSound("overtaken", "assets/Overtaken.m4a")
 
@@ -1136,15 +1135,12 @@ onKeyDown("d", ()=> {
       
   })
   
-  /*let Obungaspeed = 20;
+  /*
 
   obunga.onUpdate( () =>{
    
-    if(player.pos.y - obunga.pos.y > 4000 || player.pos.y - obunga.pos.y < -4000 || player.pos.x - obunga.pos.x > 4000 || player.pos.x - obunga.pos.x < -4000){
-      Obungaspeed = 10000;
-    }
     const dir = player.pos.sub(obunga.pos).unit()
-    obunga.move(dir.scale(Obungaspeed))
+    obunga.move(dir.scale(20))
   }) */
   
   function resetAttack(){
