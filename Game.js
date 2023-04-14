@@ -1006,7 +1006,7 @@ villain.on("death", async () => {
   go("gameWon")
   villainTheme.paused = true;
   villain.destroy()
-  motivationMusic.paused = false;
+  motivationMusic.paused = true;
 })
 
 
