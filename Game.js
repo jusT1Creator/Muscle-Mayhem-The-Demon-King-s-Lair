@@ -244,7 +244,7 @@ function enemyAttack(){
       { 
       const enemyAttackField = add([
       pos(position),
-      area({scale: vec2(6, 3)}),
+      area({scale: vec2(4, 2)}),
       sprite("attackField"),
       anchor("center"),
      "enemyAttackField"
@@ -804,8 +804,9 @@ export function Game(){
   }),
 
   
-  onUpdate(()=>{
+  onUpdate( async ()=>{
     if(bHasLost){
+      await wait(1)
       go("gameOver")
     }
   })
@@ -895,9 +896,12 @@ setBackground(BLACK, 1),
     villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - 500, player.pos.y - 350)
     villainHealthBar.width = villain.hp()
     if(bHasLost){
+      wait(1, ()=>{
       go("gameOver")
       villainTheme.paused = true;
       motivationMusic.paused = true;
+      })
+      
     }
     if(villain.hp() <= 370){
       motivationMusic.paused = false;
@@ -997,7 +1001,8 @@ villain.onStateEnter("idle", ()=>{
   wait(2, ()=> villain.enterState("moving"))
 })
 
-villain.on("death", () => {
+villain.on("death", async () => {
+  await wait(1)
   go("gameWon")
   villainTheme.paused = true;
   villain.destroy()

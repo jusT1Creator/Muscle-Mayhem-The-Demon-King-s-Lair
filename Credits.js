@@ -63,10 +63,24 @@ addButton("Return to home screen", vec2(900, 700), () => {
 	//Startmusic.paused = true;
 })
 
+let creditsText = `
+This game was developed and designed by: 
+De Simone Tiziano
+Sklodowski Marcin
+Samayoa-Usher Ian Enrique
+Jacobs Nathan
+
+Music used
+
+Glorious Morning 2 || Waterflame
+進撃gt20130218巨人 || Hiroyuki Sawano
+Jet Set Run || Yuki Hayashi
+オール・フォー・ワンの力 || Yuki Hayashi
+`
+
 
 const txt = add([
-	text("This game was developed and designed by: \nDe Simone Tiziano\nSklodowski Marcin\nSamayoa-Usher Ian Enrique\nJacobs Nathan\nMusic used: [insert music name|creator]", 
-    { size: 32, width: width() - 230, align: "center" }),
+	text(creditsText, { size: 32, width: width() - 230, align: "center" }),
 	pos(900, 400),
 	anchor("center"),
 	color(255, 255, 255),
