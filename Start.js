@@ -2,9 +2,11 @@ import k from "./kabam.js"
 import { Game } from "./Game.js";
 import music from "./Game.js";
 import { Credits } from "./Credits.js";
+import { HowToPlay } from "./HowToPlay.js";
 
 scene("credits", Credits)
 scene("game", Game)
+scene("HowTo", HowToPlay)
 
 loadSound("StartMusic", "assets/Aot relaxing music.m4a")
 
@@ -80,17 +82,30 @@ addButton("Start", vec2(200, 100), () => {
 })
 addButton("Credits", vec2(200, 200), () => {
 	go("credits")
-	music.paused = false;
 	Startmusic.paused = true;
 })
 
+addButton("How to play", vec2(200, 300), () => {
+	go("HowTo")
+	Startmusic.paused = true;
+})
+
+let whatToDoText = `
+I welcome you to our game,
+your objective is to find the way
+to the secret lair of the villain and beat him.
+However this is no easy task,
+You have to conquer five castles
+which are guarded by vicious slimes.
+A small spirit will guide you to them.
+Are you ready for the challenge?
+`
 
 
 const txt = add([
-	text("I welcome you to our game,\nyour objective is to find the way\nto the secret lair of the villain and beat him.\nHowever this is no easy task,\nthe way is guarded by a hoard of slimes\naiming to beat you up!\nAre you ready for the challenge?", 
-	{ size: 32, width: width() - 230, align: "left" }),
-	pos(800, 700),
-	anchor("center"),
+	text(whatToDoText, { size: 32, width: width() - 230, align: "left" }),
+	pos(width() / 20, height() / 1.4),
+	anchor("left"),
 	color(0, 0, 0),
 ])
 }

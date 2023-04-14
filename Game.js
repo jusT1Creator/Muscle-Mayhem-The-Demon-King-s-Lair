@@ -540,13 +540,13 @@ const villain = add([
 const healthBarVisualisationAssistant = player.add([
   rect(player.hp() * 3, 25),
   color(170, 170, 170),
-  pos(-700, 300),
+  pos(-width() / 2.4, height() / 3),
 ])
 
 
 const healthBar = player.add([
   rect(player.hp() * 3, 25),
-  pos(-700, 300),
+  pos(-width() / 2.4, height () / 3),
   color(255, 0, 0)
 ])
 
@@ -646,7 +646,7 @@ function resetPlayerHealth(){
 
 
 
-export function Game(){
+export function Dungeon(){
   bHasEnteredDungeon = false
   music.seek(0)
   bHasLost = false
@@ -843,7 +843,7 @@ player.onCollide("castle", async (Castle)=>{
 
 scene("dungeon", Dungeon)
 
-export function Dungeon(){
+export function Game(){
   bHasEnteredDungeon = true
   addLevel([
     "|||||||",
@@ -893,7 +893,7 @@ setBackground(BLACK, 1),
   villainTheme.seek(0);
   add(villainHealthBarVisualisationAssistant)
   onUpdate(()=>{
-    villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - 500, player.pos.y - 350)
+    villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - villainHealthBarVisualisationAssistant.width / 2, player.pos.y - height() / 2.4)
     villainHealthBar.width = villain.hp()
     if(bHasLost){
       wait(1, ()=>{
