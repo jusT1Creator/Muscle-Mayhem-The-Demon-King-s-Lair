@@ -244,7 +244,7 @@ function enemyAttack(){
       { 
       const enemyAttackField = add([
       pos(position),
-      area({scale: vec2(4, 2)}),
+      area({scale: vec2(5, 2.5)}),
       sprite("attackField"),
       anchor("center"),
      "enemyAttackField"
@@ -646,7 +646,7 @@ function resetPlayerHealth(){
 
 
 
-export function Dungeon(){
+export function Game(){
   bHasEnteredDungeon = false
   music.seek(0)
   bHasLost = false
@@ -843,7 +843,7 @@ player.onCollide("castle", async (Castle)=>{
 
 scene("dungeon", Dungeon)
 
-export function Game(){
+export function Dungeon(){
   bHasEnteredDungeon = true
   addLevel([
     "|||||||",
