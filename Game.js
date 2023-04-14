@@ -31,7 +31,7 @@ loadSprite("toitoi", "assets/toi toi for game.png")
 
 loadSprite("grass", "assets/Grass_Background.png");
 
-loadSprite("obunga", "assets/OIP.png");
+loadSprite("obunga", "assets/Obunga.png");
 
 loadSprite("player", "assets/Ball.png");
 
