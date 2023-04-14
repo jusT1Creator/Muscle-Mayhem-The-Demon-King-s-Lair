@@ -874,7 +874,7 @@ export function Dungeon(){
     },
   }),
 
-setBackground(BLACK, 1),
+  setBackground(BLACK, 1),
 
   bHasLost = false,
   player.pos = vec2(0,0),
@@ -892,19 +892,21 @@ setBackground(BLACK, 1),
   villainTheme.seek(0);
   add(villainHealthBarVisualisationAssistant)
   onUpdate(()=>{
-    villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - villainHealthBarVisualisationAssistant.width / 2, player.pos.y - height() / 2.4)
-    villainHealthBar.width = villain.hp()
-    if(bHasLost){
-      wait(1, ()=>{
-      go("gameOver")
-      villainTheme.paused = true;
-      motivationMusic.paused = true;
-      })
-      
-    }
-    if(villain.hp() <= 370){
-      motivationMusic.paused = false;
-      villainTheme.paused = true;
+    if(bHasEnteredDungeon){
+      villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - villainHealthBarVisualisationAssistant.width / 2, player.pos.y - height() / 2.4)
+      villainHealthBar.width = villain.hp()
+      if(bHasLost){
+        wait(1, ()=>{
+        go("gameOver")
+        villainTheme.paused = true;
+        motivationMusic.paused = true;
+        })
+        
+      }
+      if(villain.hp() <= 370){
+        motivationMusic.paused = false;
+        villainTheme.paused = true;
+      }
     }
   })
 }
@@ -1001,6 +1003,9 @@ villain.onStateEnter("idle", ()=>{
 })
 
 villain.on("death", async () => {
+  villain.destroy()
+  villainTheme.paused = true;
+  motivationMusic.paused = true;
   await wait(1)
   go("gameWon")
   villainTheme.paused = true;
