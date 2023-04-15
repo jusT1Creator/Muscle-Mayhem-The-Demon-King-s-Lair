@@ -530,7 +530,7 @@ const villain = add([
   "villain",
   {
     dead: false,
-    speed: 100,
+    speed: 150,
     bInCloseRangeAttack: false,
     bAttackStateCalled: false,
   }
@@ -551,7 +551,7 @@ const healthBar = player.add([
 
 healthBar.add([
   text("hp:", {size: 25})
-])
+])  
 
 const villainHealthBarVisualisationAssistant = add([
   rect(villain.hp(), 25),
