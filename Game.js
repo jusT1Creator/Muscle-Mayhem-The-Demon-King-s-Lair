@@ -1002,15 +1002,13 @@ villain.onStateEnter("idle", ()=>{
   wait(2, ()=> villain.enterState("moving"))
 })
 
-villain.on("death", async () => {
+villain.on("death",  () => {
   villain.destroy()
+  wait(1, ()=>{
+    go("gameWon")
   villainTheme.paused = true;
   motivationMusic.paused = true;
-  await wait(1)
-  go("gameWon")
-  villainTheme.paused = true;
-  villain.destroy()
-  motivationMusic.paused = true;
+  })
 })
 
 
