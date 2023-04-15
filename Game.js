@@ -77,7 +77,7 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
       from: 4, 
       to: 11,
       loop: true,
-      speed: 16,
+      speed: 14,
     },
     runForward:{
       from: 12,
