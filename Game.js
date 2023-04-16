@@ -1287,7 +1287,7 @@ let attackedEnemy
 
   function ManageAttackEffects(){
     
-    let knockBackForce = 6;
+    let knockBackForce = 4;
     if(isCollidingWithEnemy){
       let Dmg = 15;
     if(player.state === "leftRight")
@@ -1328,18 +1328,18 @@ let attackedEnemy
         knockbackX = 0
       }else if(attackFieldConditionX < 0)
       {
-        knockbackX = -75
+        knockbackX = -40
       }else{
-        knockbackX = 75
+        knockbackX = 40
       }
 
       if(attackFieldConditionY == 0){
         knockbackY = 0
       }else if(attackFieldConditionY < 0)
       {
-        knockbackY = -75
+        knockbackY = -40
       }else{
-        knockbackY = 75
+        knockbackY = 40
       }
 
       knockbackX *= knockBackForce
