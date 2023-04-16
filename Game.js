@@ -746,10 +746,10 @@ export function Game(){
     "",
     "",
     "  c",
-    "                          c",
+    "                        c",
     "",
     "         c",
-    "                         t",
+    "                        t",
   ], {
     tileWidth: 400,
     tileHeight: 400,
@@ -758,6 +758,7 @@ export function Game(){
       "t": () => [
         sprite("toitoi"),
         anchor("center"),
+        scale(1.4, 1.4),
         area({
           scale: vec2(0.25, 0.25)
         }),
@@ -772,6 +773,7 @@ export function Game(){
         area(),
         castle(),
         pos(),
+        scale(1.3, 1.3),
         "castle",
         {
           bCanSpwanEnemies: false,
