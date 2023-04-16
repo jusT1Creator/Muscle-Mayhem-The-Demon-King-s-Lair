@@ -965,7 +965,7 @@ villain.onStateEnter("attack", ()=>{
     if(villain.curAnim() != "projectile"){
       villain.play("projectile", {
         onEnd: async ()=> {
-          for(let i = 0; i < 5; i++){
+          for(let i = 0; i < 7; i++){
             await wait(0.2)
             villain.projectileAttack(player.pos)
           }
