@@ -903,7 +903,7 @@ export function Dungeon(){
         })
         
       }
-      if(villain.hp() <= 370){
+      if(villain.hp() <= 500){
         motivationMusic.paused = false;
         villainTheme.paused = true;
       }
