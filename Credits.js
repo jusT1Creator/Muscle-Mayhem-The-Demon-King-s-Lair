@@ -76,6 +76,7 @@ Glorious Morning 2 || Waterflame
 進撃gt20130218巨人 || Hiroyuki Sawano
 Jet Set Run || Yuki Hayashi
 オール・フォー・ワンの力 || Yuki Hayashi
+Levanta || S7VEN
 `
 
 
