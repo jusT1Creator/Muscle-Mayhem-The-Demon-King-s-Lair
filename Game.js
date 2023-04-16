@@ -63,6 +63,8 @@ loadSprite("projectile_explosion", "assets/projectile_explosion_spritesheet.png"
   }
 })
 
+
+
 loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   sliceX:4,
   sliceY:11,
@@ -124,6 +126,7 @@ loadSprite("Bruce_Wang", "assets/Bruce_Wang_SpriteSheet.png",{
   },
 
 });
+
 
 
 loadSprite("Vertical_Attacks", "assets/Vertical_attacks.png", {
@@ -203,13 +206,13 @@ loadSprite("villain", "assets/villain_spriteSheet.png",{
       from: 8,
       to: 16,
       loop: false,
-      speed: 8
+      speed: 10
     },
     projectile:{
       from: 17,
       to: 27,
       loop: false,
-      speed: 8,
+      speed: 10,
     }
   }
 })
@@ -467,6 +470,23 @@ function projectieDestructionManager(){
     }
   }
 }
+
+function villainPowerState(){
+  return{
+    baseState(villain){
+      villain.speed = 100
+      villain.attackDamage =  40,
+      villain.projectileAmount = 4
+      villain.attackInterval = 2.25
+    },
+    powerupState(villain){
+      villain.speed = 160
+      villain.attackDamage =  65,
+      villain.projectileAmount = 7
+      villain.attackInterval = 1.75
+    }
+  }
+}
   
 
 
@@ -526,13 +546,17 @@ const villain = add([
   anchor("center"),
   state("idle", ["idle","moving", "attack"]),
   villainAttack(),
+  villainPowerState(),
   "enemy",
   "villain",
   {
     dead: false,
-    speed: 150,
+    speed: 100,
     bInCloseRangeAttack: false,
     bAttackStateCalled: false,
+    attackDamage: 50,
+    projectileAmount: 4,
+    attackInterval: 2.5
   }
 ])
 
@@ -622,12 +646,14 @@ const playerAttackField = add([
   }
   
 
-// enemy.use(sprite("obunga")) THIS IS SUPER FUCKING IMPORTANT!!!!!!!!!!!!!!!!!!!!!
+// enemy.use(sprite("obunga")) THIS IS SUPER  IMPORTANT!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 
 player.play("idle");
+
+
 const obunga = add([
   sprite("obunga"),
   pos(0, -275),
@@ -891,6 +917,7 @@ export function Dungeon(){
   villainTheme.paused = false;
   villainTheme.seek(0);
   add(villainHealthBarVisualisationAssistant)
+  villain.baseState(villain)
   onUpdate(()=>{
     if(bHasEnteredDungeon){
       villainHealthBarVisualisationAssistant.pos = vec2(player.pos.x - villainHealthBarVisualisationAssistant.width / 2, player.pos.y - height() / 2.4)
@@ -906,10 +933,13 @@ export function Dungeon(){
       if(villain.hp() <= 500){
         motivationMusic.paused = false;
         villainTheme.paused = true;
+        villain.powerupState(villain);
       }
     }
   })
 }
+
+
 
 let villainLookState = 2
 let villainLookDirection = 2
@@ -952,7 +982,7 @@ villain.onStateUpdate("moving", ()=>{
   }
   if(villain.bAttackStateCalled == false){
     villain.bAttackStateCalled = true;
-    wait(2, ()=> {villain.enterState("attack")})
+    wait(villain.attackInterval, ()=> {villain.enterState("attack")})
   }
 
   
@@ -965,14 +995,14 @@ villain.onStateEnter("attack", ()=>{
     if(villain.curAnim() != "projectile"){
       villain.play("projectile", {
         onEnd: async ()=> {
-          for(let i = 0; i < 7; i++){
+          for(let i = 0; i < villain.projectileAmount; i++){
             await wait(0.2)
             villain.projectileAttack(player.pos)
           }
           
               
           
-          wait(2, ()=> {villain.enterState("moving")
+          wait(villain.attackInterval, ()=> {villain.enterState("moving")
           villain.bAttackStateCalled = false;
           })
         }
@@ -984,7 +1014,7 @@ villain.onStateEnter("attack", ()=>{
   {
     villain.play("attack", {
       onEnd: ()=> {
-        villain.attack(villain.pos, 50)
+        villain.attack(villain.pos, villain.attackDamage)
         wait(2, ()=> {villain.enterState("moving")
         villain.bAttackStateCalled = false;
       })
