@@ -1110,16 +1110,6 @@ onKeyDown("d", ()=> {
   
   
   
-  
-  onKeyPress("space", () => {  // <-------- !!!!!!!! Pause or unpause the music !!!!!!!!
-    if (music.paused) {
-      music.play()
-      music.paused = false;
-    } else {
-      music.paused = true
-    }
-  });
-  
   let attackFieldPosition
   let bHasLost
 
