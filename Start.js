@@ -93,7 +93,7 @@ addButton("How to play", vec2(200, 300), () => {
 let whatToDoText = `
 I welcome you to our game,
 your objective is to find the way
-to the secret lair of the villain and beat him.
+to the secret lair of the Demon King and beat him.
 However this is no easy task,
 You have to conquer five castles
 which are guarded by vicious slimes.
