@@ -91,13 +91,13 @@ addButton("How to play", vec2(200, 300), () => {
 })
 
 let whatToDoText = `
-I welcome you to our game,
-your objective is to find the way
-to the secret lair of the Demon King and beat him.
-However this is no easy task,
-You have to conquer five castles
-which are guarded by vicious slimes.
-A small spirit will guide you to them.
+I welcome you to our game. 
+Your objective is to free the world
+from its plague, the Demon King. 
+Protected by five castles, 
+which are guarded by vicious slimes, 
+the villain hides in the Dungeon.
+A small spirit will guide you on your way. 
 Are you ready for the challenge?
 `
 
