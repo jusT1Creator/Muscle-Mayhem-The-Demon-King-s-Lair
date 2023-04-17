@@ -2,10 +2,16 @@ import k from "./kabam.js"
 import { Start } from "./Start.js";
 
 scene("start", Start)
+loadSprite("sonic", "assets/Sonic.png")
 
 export function HowToPlay(){
 
 	setBackground(BLACK, 1),
+	add([
+		sprite("sonic"),
+		pos(),
+		scale(1.55)
+	])
     onUpdate(() => setCursor("default"))
 function addButton(txt, p, f) {
 
