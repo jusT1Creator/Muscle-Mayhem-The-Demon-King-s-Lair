@@ -97,7 +97,7 @@ from its plague, the Demon King.
 Protected by five castles, 
 which are guarded by vicious slimes, 
 the villain hides in the Dungeon.
-A small spirit will guide you on your way. 
+A friendly spirit will guide you. 
 Are you ready for the challenge?
 `
 
