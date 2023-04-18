@@ -291,8 +291,18 @@ function villainAttack(){
       shake(6) 
       const enemyAttackField = add([
       pos(position),
-      area(),
-      scale(vec2(9, 9)),
+      area({scale: vec2(0.9, 0.9), shape: new Polygon([
+        vec2(0, 50),
+        vec2(40, 40),
+        vec2(50, 0),
+        vec2(40, -40),
+        vec2(0, -50),
+        vec2(-40, -40),
+        vec2(-50, 0),
+        vec2(-40, 40)
+        ]
+      )}),
+      scale(vec2(8.5, 8.5)),
       sprite("slam_effect", {
         anim:"idle"
       }),
@@ -1034,15 +1044,14 @@ villain.onStateEnter("idle", ()=>{
   wait(2, ()=> villain.enterState("moving"))
 })
 
-villain.on("death",  () => {
+villain.on("death", async () => {
   villain.destroy()
-  wait(1, ()=>{
-    go("gameWon")
+  bHasEnteredDungeon = false
   villainTheme.paused = true;
   motivationMusic.paused = true;
-  })
+  await wait(1)
+  go("gameWon")
 })
-
 
 
 //input
