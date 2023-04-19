@@ -95,7 +95,7 @@ I welcome you to our game.
 Your objective is to free the world
 from its plague, the Demon King. 
 Protected by five castles, 
-which are guarded by vicious slimes, 
+which are guarded by vicious enemies, 
 the villain hides in the Dungeon.
 A friendly spirit will guide you. 
 Are you ready for the challenge?
