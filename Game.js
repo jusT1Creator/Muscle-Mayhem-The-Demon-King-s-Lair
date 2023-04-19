@@ -67,6 +67,9 @@ loadSprite("slimeProjectile", "assets/Slime_Projectile.png", {
     }
   }
 })
+
+loadSprite("tree", "assets/tree for game.png")
+loadSprite("otherTree", "assets/SpawnTree.png")
 loadSprite("guiding_spirit", "assets/guiding_spirit.png")
 
 loadSprite("castle", "assets/Castle for game.png")
@@ -339,7 +342,7 @@ function slimeTowerAttack(){
       slimeTowerProjectileDestruction(),
       pos(enemy.pos.x, enemy.pos.y + -200),
       {
-        speed: 650
+        speed: 750
       }
     ])
     bCanAttack = false;
@@ -358,7 +361,7 @@ function slimeTowerAttack(){
             projectile.explosion(projectile)
           }
     })
-    wait(4, ()=>{
+    wait(1.5, ()=>{
       bCanAttack = true
     })
       }
@@ -888,6 +891,39 @@ export function Game(){
         ],
     },
   })
+
+  const design = addLevel([
+    "t   o     t   o    t  t t  t",
+    " o   o   t   o    t   o     t ",
+    "  t    o  t   o     t   t   o ",
+    " o   t   t    t  o    t    o  ",
+    " t   o    o    t    t    t   o   ",
+    " o    o    t   t      o     t ",
+    "o      t     t     t     o     t  ",
+    " o     t      o      t     t    o  ",
+    "  t     t   o     o        t   o   ",
+    "   t  o   t  o   t   t  t    t   ",
+    " o o o      t t t t     oo    t ",
+    "          t t    o  o    ",
+    "   t    o       t   o     o",
+   
+    
+  ], {
+    tileWidth: 400,
+    tileHeight: 400,
+    pos: vec2(0, 0),
+    tiles: {
+      "o": () => [
+       sprite("otherTree"),
+       scale(4)
+      ],
+      "t": ()=> [
+        sprite("tree"),
+        scale(4)
+      ]
+    },
+  })
+
   const props = addLevel([
     "c",
     "         c",
@@ -937,6 +973,8 @@ export function Game(){
       ]
     },
   })
+
+  
   //add(obunga),
   allCastles = props.get("castle")
   toitoi = props.get("portal")[0]
