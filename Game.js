@@ -1171,15 +1171,15 @@ export function Dungeon(){
     tiles: {
       "b": () => [
        sprite("Bones"),
-       scale()
+       scale(1.6, 1.6)
       ],
       "s": ()=> [
         sprite("Skull"),
-        scale()
+        scale(1.3, 1.3)
       ],
       "a": ()=> [
         sprite("Arm"),
-        scale()
+        scale(0.9, 0.9)
       ],
       "m":()=>[
         sprite("Magic_Circle"),
