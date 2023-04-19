@@ -23,6 +23,53 @@ setGravity(0)
 document.body.style.overflow = 'hidden';
 
 //sprites:
+
+loadSprite("slime_tower", "assets/Slime_Tower.png",{
+  sliceX: 5,
+  sliceY: 3,
+  anims:{
+    move:{
+      from: 0,
+      to: 2,
+      loop: true,
+      speed: 4
+    },
+    shoot:{
+      from: 3,
+      to: 10,
+      loop: false,
+      speed: 7
+    },
+    idle:{
+      from: 0,
+      to: 0,
+      loop: true,
+      speed: 1
+    },
+    death:{
+      from: 11,
+      to: 13,
+      loop: false,
+      speed: 7
+    }
+  }
+})
+
+loadSprite("slimeProjectile", "assets/Slime_Projectile.png", {
+  sliceX: 3,
+  sliceY: 1,
+  anims:{
+    explode:{
+      from: 0,
+      to: 2,
+      loop: false,
+      speed: 7
+    }
+  }
+})
+
+loadSprite("tree", "assets/tree for game.png")
+loadSprite("otherTree", "assets/SpawnTree.png")
 loadSprite("guiding_spirit", "assets/guiding_spirit.png")
 
 loadSprite("castle", "assets/Castle for game.png")
@@ -280,6 +327,77 @@ function enemyAttack(){
   }
 }
 
+function slimeTowerAttack(){
+  let bCanAttack = true;
+  let bInAttack = false;
+  return{
+    attack(enemy, playerPosition)
+    {
+      if(bCanAttack)
+      { 
+    const projectile = add([
+      sprite("slimeProjectile"),
+      area(),
+      anchor("center"),
+      slimeTowerProjectileDestruction(),
+      pos(enemy.pos.x, enemy.pos.y + -200),
+      {
+        speed: 750
+      }
+    ])
+    bCanAttack = false;
+    projectile.onCollide("player", ()=>{
+      player.hurt(15);
+      shake(4)
+      projectile.explosion(projectile)
+      })
+
+    projectile.onUpdate(()=>{
+      const dir = playerPosition.sub(projectile.pos).unit()
+          projectile.move(dir.scale(projectile.speed))
+          
+          if(projectile.pos.x - playerPosition.x < 15 && projectile.pos.x - playerPosition.x  > -15 ){
+            projectile.speed = 0
+            projectile.explosion(projectile)
+          }
+    })
+    wait(1.5, ()=>{
+      bCanAttack = true
+    })
+      }
+    },
+    getCanAttack(){
+      return bCanAttack;
+    },
+    setCanAttack(value){
+      bCanAttack = value
+    },
+    getInAttack(){
+      return bInAttack;
+    },
+    setInAttack(value){
+      bInAttack = value
+    }
+  }
+}
+
+function slimeTowerProjectileDestruction(){
+  return{
+    explosion(projectile){
+      const projectileExplosion = add([
+        sprite("slimeProjectile"),
+        pos(projectile.pos)
+      ])
+
+      projectileExplosion.play("explode",{
+        onEnd: ()=> projectileExplosion.destroy()
+      })
+
+      projectile.destroy();
+    }
+  }
+}
+
 function villainAttack(){
   let bCanAttack = true;
   let bCanShootProjectile = true;
@@ -400,7 +518,33 @@ function castle(){
       ])
       slime.healthBar(slime)
       slime.castleAffiliation = id
-    }, soldierDefeated(Castle){
+    }, spawnTower(posX, posY, id){
+      const slimeTower = add([
+      sprite("slime_tower",{
+        anim: "move"
+      }),
+      area(),
+      scale(vec2(5, 5)),
+      pos(posX, posY),
+      health(100),
+      anchor("center"),
+      slimeTowerAttack(),
+      enemyHealthBar(),
+      state("idle", ["idle", "attack"]),
+      "enemy",
+      "slimeTower",
+      {
+        bIsDead: false,
+        lookDirection: 1,
+        lookState: 1,
+        castleAffiliation: 1
+      }
+    ])
+    slimeTower.healthBar(slimeTower)
+    slimeTower.castleAffiliation = id
+    },
+    
+    soldierDefeated(Castle){
       Castle.bEnemiesToDefeat--
 
       if(Castle.bEnemiesToDefeat == 0){
@@ -616,28 +760,29 @@ const playerAttackField = add([
 ])
 
 
-/*function SpawnEnemies(posX, posY){
-  const slime = add([
-    sprite("slime",{
-      anim: "runForward"
+/*function SpawnSlimeTower(posX, posY){
+  const slimeTower = add([
+    sprite("slime_tower",{
+      anim: "move"
     }),
-    area({ 
-      scale: vec2(0.5, 0.5),
-    }),
+    area(),
     scale(vec2(5, 5)),
     pos(posX, posY),
-    health(50),
+    health(100),
     anchor("center"),
-    enemyAttack(),
+    slimeTowerAttack(),
     enemyHealthBar(),
     state("idle", ["idle", "attack"]),
     "enemy",
-    "slime",
+    "slimeTower",
     {
-      bIsDead: false
+      bIsDead: false,
+      lookDirection: 1,
+      lookState: 1,
+      castleAffiliation: 1
     }
   ])
-  slime.healthBar(slime)
+  slimeTower.healthBar(slimeTower)
 }*/
 
   function enemyHealthBar(){
@@ -646,8 +791,8 @@ const playerAttackField = add([
     let healthBarAssist
     return{
       healthBar(enemy){
-        healthBarAssist = enemy.add([rect(5, 1), pos(0, 0), color(170, 170,170)])
-        healthBar = enemy.add([rect(5, 1), pos(0, 0), color(255, 0,0)])
+        healthBarAssist = enemy.add([rect(enemy.hp()/10, 1), pos(0, 0), color(170, 170,170)])
+        healthBar = enemy.add([rect(enemy.hp()/10, 1), pos(0, 0), color(255, 0,0)])
       }, healthBarActualisation(enemy){
         healthBarSize = enemy.hp() / 10
         healthBar.width = healthBarSize;
@@ -746,6 +891,39 @@ export function Game(){
         ],
     },
   })
+
+  const design = addLevel([
+    "t   o     t   o    t  t t  t",
+    " o   o   t   o    t   o     t ",
+    "  t    o  t   o     t   t   o ",
+    " o   t   t    t  o    t    o  ",
+    " t   o    o    t    t    t   o   ",
+    " o    o    t   t      o     t ",
+    "o      t     t     t     o     t  ",
+    " o     t      o      t     t    o  ",
+    "  t     t   o     o        t   o   ",
+    "   t  o   t  o   t   t  t    t   ",
+    " o o o      t t t t     oo    t ",
+    "          t t    o  o    ",
+    "   t    o       t   o     o",
+   
+    
+  ], {
+    tileWidth: 400,
+    tileHeight: 400,
+    pos: vec2(0, 0),
+    tiles: {
+      "o": () => [
+       sprite("otherTree"),
+       scale(4)
+      ],
+      "t": ()=> [
+        sprite("tree"),
+        scale(4)
+      ]
+    },
+  })
+
   const props = addLevel([
     "c",
     "         c",
@@ -795,14 +973,15 @@ export function Game(){
       ]
     },
   })
+
+  
   //add(obunga),
   allCastles = props.get("castle")
   toitoi = props.get("portal")[0]
   add(player),
   add(playerAttackField),
-
   onUpdate("slime", (enemy)=>{
-    enemy.healthBarActualisation(enemy)
+    
     const dir = player.pos.sub(enemy.pos).unit()
     if((player.pos.x - enemy.pos.x  > 120 || player.pos.x - enemy.pos.x < -120 || player.pos.y - enemy.pos.y  > 150 || player.pos.y - enemy.pos.y < -150) && enemy.getInAttack() == false && enemy.bIsDead == false){
       enemy.move(dir.scale(200))
@@ -823,8 +1002,7 @@ export function Game(){
     }
   }
 
-  
-   
+     
     if(enemy.hp() <= 0){
       enemy.setCanAttack(false)
       enemy.bIsDead = true
@@ -840,6 +1018,61 @@ export function Game(){
 
   }),
 
+  onUpdate("enemy", (enemy)=>{
+    enemy.healthBarActualisation(enemy)
+  }),
+
+  onUpdate("slimeTower", (enemy)=>{
+    const dir = player.pos.sub(enemy.pos).unit()
+    if((player.pos.x - enemy.pos.x  > 600 || player.pos.x - enemy.pos.x < -600 || player.pos.y - enemy.pos.y  > 600 || player.pos.y - enemy.pos.y < -600) && enemy.bIsDead == false && !enemy.getInAttack()){
+      enemy.move(dir.scale(50))
+      if(enemy.curAnim() != "move") 
+      {
+      enemy.play("move")
+      }
+    }else if(enemy.getCanAttack()){
+      if(enemy.curAnim() != "shoot") 
+      {
+        enemy.setInAttack(true)
+      enemy.play("shoot", {
+        onEnd: ()=> {enemy.attack(enemy, player.pos)
+        enemy.setInAttack(false)
+        }
+      })
+      }
+    }else if(!enemy.bIsDead){
+      enemy.play("idle")
+    }
+
+    if(player.pos.x - enemy.pos.x > 0){
+      enemy.lookDirection = 1
+    } else{
+      enemy.lookDirection = 2
+    }
+  
+    if(enemy.lookState != enemy.lookDirection){
+      if(enemy.lookState == 1){
+        enemy.lookState = 2
+        enemy.flipX = true
+      }else if(villainLookState == 2){
+        enemy.lookState = 1
+        enemy.flipX = false
+      }
+    }
+
+    if(enemy.hp() <= 0){
+      enemy.setCanAttack(false)
+      enemy.bIsDead = true
+      if(enemy.curAnim() != "death"){
+        enemy.play("death",{
+          onEnd: ()=>{
+            destroy(enemy)
+            allCastles[enemy.castleAffiliation].soldierDefeated(allCastles[enemy.castleAffiliation])
+          }
+        })
+      }
+    }
+  })
   
   onUpdate( async ()=>{
     if(bHasLost){
@@ -873,6 +1106,10 @@ player.onCollide("castle", async (Castle)=>{
     for(let i = 0; i < Castle.NumberOfEnemies; i++){
       await wait(1)
       Castle.SpawnEnemies(Castle.worldPos().x, Castle.worldPos().y, Castle.castleId);
+    }
+    if(Castle.castleId >= 2){
+      Castle.bEnemiesToDefeat++
+      Castle.spawnTower(Castle.worldPos().x, Castle.worldPos().y, Castle.castleId)
     }
     
   }
