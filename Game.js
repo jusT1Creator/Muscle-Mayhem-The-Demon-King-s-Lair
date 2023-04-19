@@ -24,6 +24,11 @@ document.body.style.overflow = 'hidden';
 
 //sprites:
 
+loadSprite("Arm", "assets/DecoArmSkelett.png")
+loadSprite("Bones", "assets/DecoBones.png")
+loadSprite("Skull", "assets/DecoSkull.png")
+loadSprite("Magic_Circle", "assets/DecoMagicCircle.png")
+
 loadSprite("slime_tower", "assets/Slime_Tower.png",{
   sliceX: 5,
   sliceY: 3,
@@ -1147,7 +1152,44 @@ export function Dungeon(){
           "Dwall",
         ],
     },
-  }),
+  })
+
+  const design = addLevel([
+    "m^^^^^^^^^^^^^m",
+    "^^^^^^s^^^b^^^^",
+    "^^^^s^^a^^^^^^^",
+    "^^^^^^^^^^^b^^^",
+    "^^^^^^s^^^^^^^^",
+    "m^^^^b^^^^^^a^m",
+    "",
+   
+    
+  ], {
+    tileWidth: 235,
+    tileHeight: 520,
+    pos: vec2(-2080, -1560),
+    tiles: {
+      "b": () => [
+       sprite("Bones"),
+       scale()
+      ],
+      "s": ()=> [
+        sprite("Skull"),
+        scale()
+      ],
+      "a": ()=> [
+        sprite("Arm"),
+        scale()
+      ],
+      "m":()=>[
+        sprite("Magic_Circle"),
+        scale()
+      ],
+      "^":()=>[
+        //just visual assistant for placement
+      ]
+    },
+  })
 
   setBackground(BLACK, 1),
 

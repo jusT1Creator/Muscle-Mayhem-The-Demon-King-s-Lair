@@ -1,5 +1,5 @@
 import k from "./kabam.js"
-import { Game } from "./Game.js";
+import { Game, Dungeon } from "./Game.js";
 import music from "./Game.js";
 import { Credits } from "./Credits.js";
 import { HowToPlay } from "./HowToPlay.js";
