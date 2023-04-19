@@ -5,6 +5,7 @@ import { Credits } from "./Credits.js";
 scene("credits", Credits)
 scene("start", Start)
 
+loadSprite("Chad", "assets/ChadFaceWinScreen.png")
 loadSound("StartMusic", "assets/Aot relaxing music.m4a")
 loadSound("music", "assets/Bruce wang.m4a")
 
@@ -17,6 +18,11 @@ const victoryMusic = play("music", {
 
 export function GameWon(){
     setBackground(WHITE, 1),
+	add([
+		sprite("Chad"),
+		pos(),
+		scale(1.25)
+	])
     onUpdate(() => setCursor("default")),
 	victoryMusic.paused = false
 function addButton(txt, p, f) {
@@ -63,7 +69,7 @@ function addButton(txt, p, f) {
 }
 
 const txt = add([
-	text("You WON!!", { size: 32, width: width() - 230, align: "center" }),
+	text("You WON!!", { size: 40, width: width() - 230, align: "center" }),
 	pos(900, 400),
 	anchor("center"),
 	color(0, 255, 0),
