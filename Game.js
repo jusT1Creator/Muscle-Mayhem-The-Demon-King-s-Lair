@@ -899,7 +899,7 @@ export function Game(){
 
   const design = addLevel([
     "t   o    t   o    t  t   ",
-    " o   o      o    t    o     t ",
+    " o   o        t    o      ",
     "  t    o  t   o     t   t     o ",
     " o   t   t    t  o    t     o  ",
     "  t       o    t    t    t      ",
