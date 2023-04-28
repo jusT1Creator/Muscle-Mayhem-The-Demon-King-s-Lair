@@ -208,6 +208,30 @@ loadSprite("Vertical_Attacks", "assets/Vertical_attacks.png", {
       to:  20,
       loop: false,
       speed: 15
+    },
+    runHorizontal:{
+      from: 0, 
+      to: 0,
+      loop: false,
+      speed: 1,
+    },
+    runForward:{
+      from: 0,
+      to: 0,
+      loop: false,
+      speed: 1,
+    },
+    runBackward:{
+      from: 11,
+      to: 11,
+      loop: false,
+      speed: 1,
+    },
+    idle:{
+      from: 11,
+      to: 11,
+      loop: false,
+      speed: 1, 
     }
 
   }
