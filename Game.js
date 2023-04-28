@@ -232,7 +232,38 @@ loadSprite("Vertical_Attacks", "assets/Vertical_attacks.png", {
       to: 11,
       loop: false,
       speed: 1, 
+    },
+    punch:{
+      from: 0,
+      to: 0,
+      loop: false,
+      speed: 12,
+    },
+    kick:{
+      from: 0,
+      to: 0,
+      loop: false,
+      speed:12
+    },
+    airKickOne:{
+      from: 0,
+      to:0,
+      loop: false,
+      speed: 15
+    },
+    airKickTwo:{
+      from: 0,
+      to: 0,
+      loop: false,
+      speed: 12
+    },
+    heal:{
+      from: 0,
+      to: 0,
+      loop:false,
+      speed:10
     }
+  
 
   }
 })
