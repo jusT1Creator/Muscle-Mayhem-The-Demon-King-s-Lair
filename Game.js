@@ -582,7 +582,7 @@ function castle(){
 
       if(Castle.bCastleCleared && Castle.castleId != allCastles.length - 1){
         const guidingSpirit = add([
-          pos(allCastles[Castle.castleId].worldPos()),
+          pos(player.pos),
           sprite("guiding_spirit"),
           castleGuide(),
           "guide",
@@ -601,7 +601,7 @@ function castle(){
       } else if(Castle.bCastleCleared && Castle.castleId == allCastles.length -1){
         toitoi.bCanTP = true
         const guidingSpirit = add([
-          pos(allCastles[Castle.castleId].worldPos()),
+          pos(player.pos),
           sprite("guiding_spirit"),
           castleGuide(),
           "guide",
